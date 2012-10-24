@@ -1,0 +1,15 @@
+Changelog for LWP-Protocol-Net-Curl
+
+0.001 2012-10-24T18:48:26
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - tests & example
+
+ - some documentation
+
+ - compatible with Perl v5.8
+
+ - Dist::Zillified
+
+ - INIT
+
+

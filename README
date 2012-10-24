@@ -1,0 +1,77 @@
+NAME
+    LWP::Protocol::Net::Curl - the power of libcurl in the palm of your
+    hands!
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        #!/usr/bin/env perl;
+        use common::sense;
+
+        use LWP::Protocol::Net::Curl;
+        use WWW::Mechanize;
+
+        ...
+
+DESCRIPTION
+    Drop-in replacement for LWP, WWW::Mechanize & derivatives to use
+    Net::Curl as a backend.
+
+    Advantages:
+
+    *   support ftp/ftps/http/https/sftp/scp/SOCKS protocols out-of-box (if
+        your libcurl <http://curl.haxx.se/> is compiled to support them)
+
+    *   lightning-fast HTTP compression
+        <https://en.wikipedia.org/wiki/Http_compression>
+
+    *   100% compatible with WWW::Mechanize test suite
+
+    *   lower CPU/memory usage: this matters if you "fork()" multiple
+        downloader instances
+
+LIBCURL INTERFACE
+    You may query which LWP protocols are implemented through Net::Curl by
+    accessing @LWP::Protocol::Net::Curl::implements.
+
+    Default curl_easy_setopt() options
+    <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html> can be set during
+    initialization:
+
+        use LWP::Protocol::Net::Curl
+            encoding => '', # use HTTP compression by default
+            referer => 'http://google.com/',
+            verbose => 1;   # make libcurl print lots of stuff to STDERR
+
+    Options set this way have the lowest precedence. For instance, if
+    WWW::Mechanize sets the *Referer:* by it's own, the value you defined
+    above won't be used.
+
+TODO
+    *   better implementation for non-HTTP protocols
+
+    *   more tests
+
+    *   test exotic LWP usage cases
+
+    *   non-blocking version
+
+SEE ALSO
+    *   LWP::Protocol::GHTTP - used as a reference
+
+    *   LWP::Protocol::AnyEvent::http - another reference
+
+    *   Net::Curl - backend for this module
+
+    *   LWP::Curl - provides LWP::UserAgent-compatible API for libcurl
+
+AUTHOR
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
