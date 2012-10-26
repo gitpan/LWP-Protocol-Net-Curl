@@ -13,7 +13,7 @@ use HTTP::Date;
 use Net::Curl::Easy qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @implements =
     sort grep { defined }
@@ -26,6 +26,24 @@ LWP::Protocol::implementor($_ => __PACKAGE__)
 our %curlopt;
 
 
+sub _curlopt {
+    my ($key) = @_;
+
+    $key =~ s/^Net::Curl::Easy:://ix;
+    $key =~ y/-/_/;
+    $key =~ s/\W//gx;
+    $key = uc $key;
+    $key = qq(CURLOPT_${key}) if $key !~ /^CURLOPT_/x;
+
+    my $const = eval {
+        no strict qw(refs); ## no critic
+        return *$key->();
+    };
+    carp qq(Invalid libcurl constant: $key) if not defined $const or $@;
+
+    return $const;
+}
+
 sub import {
     my (undef, @args) = @_;
 
@@ -35,17 +53,7 @@ sub import {
             if (looks_like_number($key)) {
                 $curlopt{$key} = $value;
             } else {
-                $key =~ s/^Net::Curl::Easy:://ix;
-                $key =~ y/-/_/;
-                $key =~ s/\W//gx;
-                $key = uc $key;
-                $key = qq(CURLOPT_${key}) if $key !~ /^CURLOPT_/x;
-
-                eval {
-                    no strict qw(refs); ## no critic
-                    $curlopt{*$key->()} = $value;
-                };
-                carp qq(Invalid libcurl constant: $key) if $@;
+                $curlopt{_curlopt($key)} = $value;
             }
         }
     }
@@ -66,37 +74,52 @@ sub request {
         $easy->setopt($key, $value);
     }
 
-    $easy->setopt(CURLOPT_BUFFERSIZE        ,=> $size)
-        if defined $size and $size;
-    $easy->setopt(CURLOPT_TIMEOUT           ,=> $timeout)
-        if defined $timeout and $timeout;
+    # SSL stuff, may not be compiled
+    if ($request->uri->scheme =~ /s$/ix) {
+        $easy->setopt(_curlopt(q(CAINFO))           => $self->{ua}{ssl_opts}{SSL_ca_file});
+        $easy->setopt(_curlopt(q(CAPATH))           => $self->{ua}{ssl_opts}{SSL_ca_path});
+        $easy->setopt(_curlopt(q(SSL_VERIFYHOST))   => $self->{ua}{ssl_opts}{verify_hostname});
+    }
 
-    #$easy->setopt(CURLOPT_NOPROGRESS        ,=> 0);
-    #$easy->setopt(CURLOPT_PROGRESSFUNCTION  ,=> sub {});
-
+    $easy->setopt(CURLOPT_BUFFERSIZE        ,=> $size);
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
     $easy->setopt(CURLOPT_FOLLOWLOCATION    ,=> 0);
-    $easy->setopt(CURLOPT_PROXY             ,=> ref($proxy) =~ /^URI\b/x ? $proxy->as_string : '');
+    $easy->setopt(CURLOPT_INTERFACE         ,=> $self->{ua}{local_address});
+    $easy->setopt(CURLOPT_MAXFILESIZE       ,=> $self->{ua}{max_size});
+    $easy->setopt(CURLOPT_PROXY             ,=> $proxy);
+    $easy->setopt(CURLOPT_TIMEOUT           ,=> $timeout);
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
     $easy->setopt(CURLOPT_WRITEDATA         ,=> \$data);
     $easy->setopt(CURLOPT_WRITEHEADER       ,=> \$header);
 
     my $method = uc $request->method;
     if ($method eq q(GET)) {
-        $easy->setopt(CURLOPT_HTTPGET   ,=> 1);
+        $easy->setopt(CURLOPT_HTTPGET       ,=> 1);
     } elsif ($method eq q(POST)) {
-        $easy->setopt(CURLOPT_POSTFIELDS,=> $request->content);
+        $easy->setopt(CURLOPT_POSTFIELDS    ,=> $request->content);
     } elsif ($method eq q(HEAD)) {
-        $easy->setopt(CURLOPT_NOBODY    ,=> 1);
+        $easy->setopt(CURLOPT_NOBODY        ,=> 1);
+    } elsif ($method eq q(DELETE)) {
+        $easy->setopt(CURLOPT_CUSTOMREQUEST ,=> $method);
+    } elsif ($method eq q(PUT)) {
+        $easy->setopt(CURLOPT_UPLOAD        ,=> 1);
+        $easy->setopt(CURLOPT_READDATA      ,=> $request->content);
+        $easy->setopt(CURLOPT_INFILESIZE    ,=> length $request->content);
+        $easy->pushopt(CURLOPT_HTTPHEADER   ,=> [qq[Expect:]]); # mimic LWP behavior
     } else {
         return HTTP::Response->new(
             &HTTP::Status::RC_BAD_REQUEST,
-            qq(Bad method '$_')
+            qq(Bad method '$method')
         );
     }
 
     $request->headers->scan(sub {
         my ($key, $value) = @_;
+
+        # stolen from LWP::Protocol::http
+        $key =~ s/^://x;
+        $value =~ s/\n/ /gx;
+
         if ($key =~ /^accept-encoding$/ix) {
             my @encoding =
                 map { /^(?:x-)?(deflate|gzip|identity)$/ix ? lc $1 : () }
@@ -158,7 +181,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -172,7 +195,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-Drop-in replacement for L<LWP>, L<WWW::Mechanize> & derivatives to use L<Net::Curl> as a backend.
+Drop-in replacement for L<LWP>, L<WWW::Mechanize> and their derivatives to use L<Net::Curl> as a backend.
 
 Advantages:
 
@@ -188,7 +211,7 @@ lightning-fast L<HTTP compression|https://en.wikipedia.org/wiki/Http_compression
 
 =item *
 
-100% compatible with L<WWW::Mechanize> test suite
+100% compatible with both L<LWP> and L<WWW::Mechanize> test suites
 
 =item *
 

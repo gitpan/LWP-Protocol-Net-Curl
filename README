@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -15,7 +15,7 @@ SYNOPSIS
         ...
 
 DESCRIPTION
-    Drop-in replacement for LWP, WWW::Mechanize & derivatives to use
+    Drop-in replacement for LWP, WWW::Mechanize and their derivatives to use
     Net::Curl as a backend.
 
     Advantages:
@@ -26,7 +26,7 @@ DESCRIPTION
     *   lightning-fast HTTP compression
         <https://en.wikipedia.org/wiki/Http_compression>
 
-    *   100% compatible with WWW::Mechanize test suite
+    *   100% compatible with both LWP and WWW::Mechanize test suites
 
     *   lower CPU/memory usage: this matters if you "fork()" multiple
         downloader instances

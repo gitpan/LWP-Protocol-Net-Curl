@@ -1,6 +1,15 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.001 2012-10-24T18:48:26
+0.002 2012-10-26T20:04:13
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - more glue between libcurl & LWP
+
+ - support $ua->ssl_opts
+
+ - handle DELETE, PUT and weird request headers
+
+
+v0.001 2012-10-24T18:42:58
  [Stanislaw Pusep <creaktive@gmail.com>]
  - tests & example
 

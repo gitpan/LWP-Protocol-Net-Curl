@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "File::Find" => 0,
     "File::Temp" => 0,
+    "FindBin" => 0,
     "LWP::Simple" => 0,
     "LWP::UserAgent" => 0,
     "Test::HTTP::Server" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
