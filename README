@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.002
+    version 0.003
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -20,16 +20,23 @@ DESCRIPTION
 
     Advantages:
 
-    *   support ftp/ftps/http/https/sftp/scp/SOCKS protocols out-of-box (if
-        your libcurl <http://curl.haxx.se/> is compiled to support them)
+    *   support ftp/ftps/http/https/sftp/scp protocols out-of-box (secure
+        layer require libcurl <http://curl.haxx.se/> to be compiled with
+        TLS/SSL/libssh2 support)
+
+    *   support SOCKS4/5 proxy out-of-box
+
+    *   connection persistence and DNS cache (independent from
+        LWP::ConnCache)
 
     *   lightning-fast HTTP compression
-        <https://en.wikipedia.org/wiki/Http_compression>
+        <https://en.wikipedia.org/wiki/Http_compression> and redirection
 
-    *   100% compatible with both LWP and WWW::Mechanize test suites
+    *   lower CPU usage: this matters if you "fork()" multiple downloader
+        instances
 
-    *   lower CPU/memory usage: this matters if you "fork()" multiple
-        downloader instances
+    *   at last but not least: 100% compatible with both LWP and
+        WWW::Mechanize test suites!
 
 LIBCURL INTERFACE
     You may query which LWP protocols are implemented through Net::Curl by
@@ -40,22 +47,33 @@ LIBCURL INTERFACE
     initialization:
 
         use LWP::Protocol::Net::Curl
-            encoding => '', # use HTTP compression by default
-            referer => 'http://google.com/',
-            verbose => 1;   # make libcurl print lots of stuff to STDERR
+            encoding    => '',  # use HTTP compression by default
+            referer     => 'http://google.com/',
+            verbose     => 1;   # make libcurl print lots of stuff to STDERR
 
     Options set this way have the lowest precedence. For instance, if
     WWW::Mechanize sets the *Referer:* by it's own, the value you defined
     above won't be used.
+
+DEBUGGING
+    Quickly enable libcurl *verbose* mode via "PERL5OPT" environment
+    variable:
+
+        PERL5OPT=-MLWP::Protocol::Net::Curl=verbose,1 perl your-script.pl
+
+    Bonus: it works even if you don't include the "use
+    LWP::Protocol::Net::Curl" line!
 
 TODO
     *   better implementation for non-HTTP protocols
 
     *   more tests
 
-    *   test exotic LWP usage cases
-
     *   non-blocking version
+
+BUGS
+    *   Complain about *Attempt to free unreferenced scalar: SV 0xdeadbeef
+        during global destruction.* if "fork()" was used somewhere.
 
 SEE ALSO
     *   LWP::Protocol::GHTTP - used as a reference

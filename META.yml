@@ -6,8 +6,8 @@ build_requires:
   File::Find: 0
   File::Temp: 0
   FindBin: 0
+  IO::Socket::INET: 0
   LWP::Simple: 0
-  LWP::UserAgent: 0
   Test::HTTP::Server: 0
   Test::More: 0
 configure_requires:
@@ -22,8 +22,12 @@ name: LWP-Protocol-Net-Curl
 requires:
   Carp: 0
   HTTP::Date: 0
+  IO::Handle: 0
   LWP::Protocol: 0
+  LWP::UserAgent: 0
   Net::Curl::Easy: 0
+  Net::Curl::Multi: 0
+  Net::Curl::Share: 0
   Scalar::Util: 0
   base: 0
   perl: 5.008
@@ -34,4 +38,4 @@ resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: 0.002
+version: 0.003

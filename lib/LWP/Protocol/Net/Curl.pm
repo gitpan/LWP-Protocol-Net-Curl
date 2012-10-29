@@ -10,10 +10,14 @@ use base qw(LWP::Protocol);
 
 use Carp qw(carp);
 use HTTP::Date;
+use IO::Handle;
+use LWP::UserAgent;
 use Net::Curl::Easy qw(:constants);
+use Net::Curl::Multi qw(:constants);
+use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @implements =
     sort grep { defined }
@@ -25,9 +29,22 @@ LWP::Protocol::implementor($_ => __PACKAGE__)
 
 our %curlopt;
 
+{
+    no strict qw(refs);         ## no critic
+    no warnings qw(redefine);   ## no critic
+
+    *{'LWP::UserAgent::progress'} = sub {};
+    *{'Net::Curl::Easy::setopt_ifdef'} = sub {
+        my ($easy, $key, $value) = @_;
+        $easy->setopt(_curlopt($key) => $value)
+            if defined $value;
+    };
+}
+
 
 sub _curlopt {
     my ($key) = @_;
+    return 0 + $key if looks_like_number($key);
 
     $key =~ s/^Net::Curl::Easy:://ix;
     $key =~ y/-/_/;
@@ -39,9 +56,9 @@ sub _curlopt {
         no strict qw(refs); ## no critic
         return *$key->();
     };
-    carp qq(Invalid libcurl constant: $key) if not defined $const or $@;
+    carp qq(Invalid libcurl constant: $key) if $@;
 
-    return $const;
+    return 0 + $const;
 }
 
 sub import {
@@ -50,11 +67,7 @@ sub import {
     if (@args) {
         my %args = @args;
         while (my ($key, $value) = each %args) {
-            if (looks_like_number($key)) {
-                $curlopt{$key} = $value;
-            } else {
-                $curlopt{_curlopt($key)} = $value;
-            }
+            $curlopt{_curlopt($key)} = $value;
         }
     }
 
@@ -64,9 +77,60 @@ sub import {
 sub request {
     my ($self, $request, $proxy, $arg, $size, $timeout) = @_;
 
+    my $ua = $self->{ua};
+    if (q(Net::Curl::Multi) ne ref $ua->{curl_multi}) {
+        $ua->{curl_multi} = Net::Curl::Multi->new;
+        $ua->{curl_share} = Net::Curl::Share->new;
+        $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_COOKIE);
+        $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
+        eval { $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
+    }
+
     my $data = '';
     my $header = '';
+    my $writedata = \$data;
+
     my $easy = Net::Curl::Easy->new;
+    $ua->{curl_multi}->add_handle($easy);
+
+    my $previous = undef;
+    my $response = HTTP::Response->new(&HTTP::Status::RC_OK);
+    $easy->setopt(CURLOPT_HEADERFUNCTION ,=> sub {
+        my (undef, $line) = @_;
+        $header .= $line;
+
+        # I hope only HTTP sends "empty line" as delimiters
+        if ($line =~ /^\s*$/sx) {
+            $response = HTTP::Response->parse($header);
+            my $msg = $response->message;
+            $msg =~ s/^\s+|\s+$//gsx;
+            $response->message($msg);
+
+            $response->request($request);
+            $response->previous($previous);
+            $previous = $response;
+
+            $header = '';
+        }
+
+        return length $line;
+    });
+
+    if (defined $arg) {
+        if ('' eq ref $arg) {
+            # will die() later
+            open my ($fh), q(+>:raw), $arg; ## no critic
+            $fh->autoflush(1);
+            $writedata = $fh;
+        } elsif (q(CODE) eq ref $arg) {
+            $easy->setopt(CURLOPT_WRITEFUNCTION ,=> sub {
+                my (undef, $chunk) = @_;
+                $arg->($chunk, $response, $self);
+                return length $chunk;
+            });
+            $writedata = undef;
+        }
+    }
 
     my $encoding = 0;
     while (my ($key, $value) = each %curlopt) {
@@ -76,21 +140,22 @@ sub request {
 
     # SSL stuff, may not be compiled
     if ($request->uri->scheme =~ /s$/ix) {
-        $easy->setopt(_curlopt(q(CAINFO))           => $self->{ua}{ssl_opts}{SSL_ca_file});
-        $easy->setopt(_curlopt(q(CAPATH))           => $self->{ua}{ssl_opts}{SSL_ca_path});
-        $easy->setopt(_curlopt(q(SSL_VERIFYHOST))   => $self->{ua}{ssl_opts}{verify_hostname});
+        $easy->setopt_ifdef(CAINFO          => $ua->{ssl_opts}{SSL_ca_file});
+        $easy->setopt_ifdef(CAPATH          => $ua->{ssl_opts}{SSL_ca_path});
+        $easy->setopt_ifdef(SSL_VERIFYHOST  => $ua->{ssl_opts}{verify_hostname});
     }
 
-    $easy->setopt(CURLOPT_BUFFERSIZE        ,=> $size);
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
-    $easy->setopt(CURLOPT_FOLLOWLOCATION    ,=> 0);
-    $easy->setopt(CURLOPT_INTERFACE         ,=> $self->{ua}{local_address});
-    $easy->setopt(CURLOPT_MAXFILESIZE       ,=> $self->{ua}{max_size});
-    $easy->setopt(CURLOPT_PROXY             ,=> $proxy);
-    $easy->setopt(CURLOPT_TIMEOUT           ,=> $timeout);
+    $easy->setopt(CURLOPT_NOPROGRESS        ,=> not $ua->show_progress);
+    $easy->setopt(CURLOPT_NOPROXY           ,=> join(q(,) => @{$ua->{no_proxy}}));
+    $easy->setopt(CURLOPT_SHARE             ,=> $ua->{curl_share});
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
-    $easy->setopt(CURLOPT_WRITEDATA         ,=> \$data);
-    $easy->setopt(CURLOPT_WRITEHEADER       ,=> \$header);
+    $easy->setopt_ifdef(CURLOPT_BUFFERSIZE  ,=> $size);
+    $easy->setopt_ifdef(CURLOPT_INTERFACE   ,=> $ua->local_address);
+    $easy->setopt_ifdef(CURLOPT_MAXFILESIZE ,=> $ua->max_size);
+    $easy->setopt_ifdef(CURLOPT_PROXY       ,=> $proxy);
+    $easy->setopt_ifdef(CURLOPT_TIMEOUT     ,=> $timeout);
+    $easy->setopt_ifdef(CURLOPT_WRITEDATA   ,=> $writedata);
 
     my $method = uc $request->method;
     if ($method eq q(GET)) {
@@ -105,7 +170,6 @@ sub request {
         $easy->setopt(CURLOPT_UPLOAD        ,=> 1);
         $easy->setopt(CURLOPT_READDATA      ,=> $request->content);
         $easy->setopt(CURLOPT_INFILESIZE    ,=> length $request->content);
-        $easy->pushopt(CURLOPT_HTTPHEADER   ,=> [qq[Expect:]]); # mimic LWP behavior
     } else {
         return HTTP::Response->new(
             &HTTP::Status::RC_BAD_REQUEST,
@@ -113,8 +177,19 @@ sub request {
         );
     }
 
+    # handle redirects internally (except POST, greatly fsck'd up by IIS servers)
+    if ($method ne q(POST) and grep { $method eq uc } @{$ua->requests_redirectable}) {
+        $easy->setopt(CURLOPT_AUTOREFERER   ,=> 1);
+        $easy->setopt(CURLOPT_FOLLOWLOCATION,=> 1);
+        $easy->setopt(CURLOPT_MAXREDIRS     ,=> $ua->max_redirect);
+    } else {
+        $easy->setopt(CURLOPT_FOLLOWLOCATION,=> 0);
+    }
+
     $request->headers->scan(sub {
         my ($key, $value) = @_;
+
+        return unless defined $value;
 
         # stolen from LWP::Protocol::http
         $key =~ s/^://x;
@@ -127,41 +202,42 @@ sub request {
 
             if (@encoding) {
                 ++$encoding;
-                $easy->setopt(CURLOPT_ENCODING ,=> join(q(, ) => @encoding));
+                $easy->setopt(CURLOPT_ENCODING  ,=> join(q(,) => @encoding));
             }
+        } elsif ($key =~ /^user-agent$/ix and $value eq $ua->_agent) {
+            $easy->setopt(CURLOPT_USERAGENT     ,=> $ua->_agent . ' ' . Net::Curl::version);
         } else {
-            $easy->pushopt(CURLOPT_HTTPHEADER ,=> [qq[$key: $value]]);
+            $easy->pushopt(CURLOPT_HTTPHEADER   ,=> [qq[$key: $value]]);
         }
     });
 
-    my $status = eval { $easy->perform; 0 };
-    if (not defined $status or $@) {
+    eval { $easy->perform };
+    my $error = looks_like_number($@) ? 0 + $@ : 0;
+    $ua->{curl_multi}->remove_handle($easy);
+    if ($error == CURLE_TOO_MANY_REDIRECTS) {
+        # will return the last request
+    } elsif ($error) {
         return HTTP::Response->new(
             &HTTP::Status::RC_BAD_REQUEST,
-            qq($@)
+            Net::Curl::Easy::strerror($error)
         );
     }
 
-    my $response = HTTP::Response->parse(
-        $request->uri->scheme =~ /^https?$/ix
-            ? $header
-            : qq(200 OK\n\n)
-    );
     $response->request($request);
-
-    my $msg = defined $response->message ? $response->message : '';
-    $msg =~ s/^\s+|\s+$//gsx;
-    $response->message($msg);
-
-    # handle decoded_content()
-    if ($encoding) {
-        $response->headers->header(content_encoding => q(identity));
-        $response->headers->header(content_length => length $data);
-    }
 
     my $time = $easy->getinfo(CURLINFO_FILETIME);
     $response->headers->header(last_modified => time2str($time))
         if $time > 0;
+
+    undef $easy;
+
+    # handle decoded_content() & direct file write
+    if (q(GLOB) eq ref $writedata) {
+        $writedata->sync;
+    } elsif ($encoding) {
+        $response->headers->header(content_encoding => q(identity));
+        $response->headers->header(content_length   => length $data);
+    }
 
     return $self->collect_once($arg, $response, $data);
 }
@@ -181,7 +257,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -203,19 +279,27 @@ Advantages:
 
 =item *
 
-support ftp/ftps/http/https/sftp/scp/SOCKS protocols out-of-box (if your L<libcurl|http://curl.haxx.se/> is compiled to support them)
+support ftp/ftps/http/https/sftp/scp protocols out-of-box (secure layer require L<libcurl|http://curl.haxx.se/> to be compiled with TLS/SSL/libssh2 support)
 
 =item *
 
-lightning-fast L<HTTP compression|https://en.wikipedia.org/wiki/Http_compression>
+support SOCKS4/5 proxy out-of-box
 
 =item *
 
-100% compatible with both L<LWP> and L<WWW::Mechanize> test suites
+connection persistence and DNS cache (independent from L<LWP::ConnCache>)
 
 =item *
 
-lower CPU/memory usage: this matters if you C<fork()> multiple downloader instances
+lightning-fast L<HTTP compression|https://en.wikipedia.org/wiki/Http_compression> and redirection
+
+=item *
+
+lower CPU usage: this matters if you C<fork()> multiple downloader instances
+
+=item *
+
+at last but not least: B<100% compatible> with both L<LWP> and L<WWW::Mechanize> test suites!
 
 =back
 
@@ -226,12 +310,20 @@ You may query which L<LWP> protocols are implemented through L<Net::Curl> by acc
 Default L<curl_easy_setopt() options|http://curl.haxx.se/libcurl/c/curl_easy_setopt.html> can be set during initialization:
 
     use LWP::Protocol::Net::Curl
-        encoding => '', # use HTTP compression by default
-        referer => 'http://google.com/',
-        verbose => 1;   # make libcurl print lots of stuff to STDERR
+        encoding    => '',  # use HTTP compression by default
+        referer     => 'http://google.com/',
+        verbose     => 1;   # make libcurl print lots of stuff to STDERR
 
 Options set this way have the lowest precedence.
 For instance, if L<WWW::Mechanize> sets the I<Referer:> by it's own, the value you defined above won't be used.
+
+=head1 DEBUGGING
+
+Quickly enable libcurl I<verbose> mode via C<PERL5OPT> environment variable:
+
+    PERL5OPT=-MLWP::Protocol::Net::Curl=verbose,1 perl your-script.pl
+
+B<Bonus:> it works even if you don't include the C<use LWP::Protocol::Net::Curl> line!
 
 =for Pod::Coverage import
 request
@@ -250,11 +342,17 @@ more tests
 
 =item *
 
-test exotic LWP usage cases
+non-blocking version
+
+=back
+
+=head1 BUGS
+
+=over 4
 
 =item *
 
-non-blocking version
+Complain about I<Attempt to free unreferenced scalar: SV 0xdeadbeef during global destruction.> if C<fork()> was used somewhere.
 
 =back
 

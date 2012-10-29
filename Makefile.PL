@@ -15,8 +15,8 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Temp" => 0,
     "FindBin" => 0,
+    "IO::Socket::INET" => 0,
     "LWP::Simple" => 0,
-    "LWP::UserAgent" => 0,
     "Test::HTTP::Server" => 0,
     "Test::More" => 0
   },
@@ -30,15 +30,19 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "HTTP::Date" => 0,
+    "IO::Handle" => 0,
     "LWP::Protocol" => 0,
+    "LWP::UserAgent" => 0,
     "Net::Curl::Easy" => 0,
+    "Net::Curl::Multi" => 0,
+    "Net::Curl::Share" => 0,
     "Scalar::Util" => 0,
     "base" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

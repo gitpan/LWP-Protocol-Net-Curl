@@ -1,6 +1,35 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.002 2012-10-26T20:04:13
+0.003 2012-10-29T18:54:26
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - Net::Curl::Easy::setopt hack
+
+ - header parser refactored
+
+ - direct filehandle output condition refactor
+
+ - fixed persistence/caching; however, "Attempt to free unreferenced
+   scalar: SV 0xdeadbeef" is back :(
+
+ - each $ua instance hold own Net::Curl::Share
+
+ - always use persistent connections; never use libcurl to handle POST
+   redirections
+
+ - share DNS/cookies/SSL
+
+ - fixed the messy redirection chain
+
+ - progressbar/noproxy support
+
+ - slurp big files directly to disk
+
+ - handle redirects via libcurl
+
+ - crude persistent connections support
+
+
+v0.002 2012-10-26T19:58:34
  [Stanislaw Pusep <creaktive@gmail.com>]
  - more glue between libcurl & LWP
 
