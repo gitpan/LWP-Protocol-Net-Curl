@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -34,6 +34,8 @@ DESCRIPTION
 
     *   lower CPU usage: this matters if you "fork()" multiple downloader
         instances
+
+    *   asynchronous threading via Coro::Select (see eg/async.pl)
 
     *   at last but not least: 100% compatible with both LWP and
         WWW::Mechanize test suites!
@@ -69,11 +71,14 @@ TODO
 
     *   more tests
 
-    *   non-blocking version
+    *   expose the inner guts of libcurl while handling encoding/redirects
+        internally
+
+    *   revise Net::Curl::Multi "event loop" code
 
 BUGS
-    *   Complain about *Attempt to free unreferenced scalar: SV 0xdeadbeef
-        during global destruction.* if "fork()" was used somewhere.
+    *   complains about *Attempt to free unreferenced scalar: SV 0xdeadbeef
+        during global destruction.*
 
 SEE ALSO
     *   LWP::Protocol::GHTTP - used as a reference

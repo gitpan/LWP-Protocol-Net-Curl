@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+eg/async.pl
 eg/benchmark.pl
 lib/LWP/Protocol/Net/Curl.pm
 perlcritic.rc
@@ -16,6 +17,7 @@ t/02-ua.t
 t/03-file.t
 t/04-callback.t
 t/05-live.t
+t/06-edge.t
 t/author-critic.t
 t/author-test-eol.t
 t/release-cpan-changes.t

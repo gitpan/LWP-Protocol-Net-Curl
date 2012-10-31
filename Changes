@@ -1,6 +1,33 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.003 2012-10-29T18:54:26
+0.004 2012-10-31T13:00:27
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - minor code/documentation cleanup
+
+ - select() seems unhappy with timeout of 1 microsecond
+
+ - POD update
+
+ - added eg/async.pl
+
+ - use a dispatch table to setup methods
+
+ - select() on Net::Curl::Multi fdset
+
+ - fixed the PUT method
+
+ - 100% coverage
+
+ - file tests cleanup
+
+ - more live tests
+
+ - edge case tests (check exception throwing for now)
+
+ - using CURL_LOCK_DATA_COOKIE was actually a *bad* idea
+
+
+v0.003 2012-10-29T18:49:01
  [Stanislaw Pusep <creaktive@gmail.com>]
  - Net::Curl::Easy::setopt hack
 

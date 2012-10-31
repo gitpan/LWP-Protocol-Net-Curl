@@ -17,7 +17,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @implements =
     sort grep { defined }
@@ -53,12 +53,13 @@ sub _curlopt {
     $key = qq(CURLOPT_${key}) if $key !~ /^CURLOPT_/x;
 
     my $const = eval {
-        no strict qw(refs); ## no critic
+        no strict qw(refs);     ## no critic
+        no warnings qw(once);   ## no critic
         return *$key->();
     };
     carp qq(Invalid libcurl constant: $key) if $@;
 
-    return 0 + $const;
+    return $const;
 }
 
 sub import {
@@ -67,7 +68,9 @@ sub import {
     if (@args) {
         my %args = @args;
         while (my ($key, $value) = each %args) {
-            $curlopt{_curlopt($key)} = $value;
+            my $const = _curlopt($key);
+            $curlopt{$const} = $value
+                if defined $const;
         }
     }
 
@@ -81,20 +84,21 @@ sub request {
     if (q(Net::Curl::Multi) ne ref $ua->{curl_multi}) {
         $ua->{curl_multi} = Net::Curl::Multi->new;
         $ua->{curl_share} = Net::Curl::Share->new;
-        $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_COOKIE);
         $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
         eval { $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
     }
 
     my $data = '';
     my $header = '';
-    my $writedata = \$data;
+    my $writedata;
 
     my $easy = Net::Curl::Easy->new;
     $ua->{curl_multi}->add_handle($easy);
 
     my $previous = undef;
     my $response = HTTP::Response->new(&HTTP::Status::RC_OK);
+    $response->request($request);
+
     $easy->setopt(CURLOPT_HEADERFUNCTION ,=> sub {
         my (undef, $line) = @_;
         $header .= $line;
@@ -116,20 +120,20 @@ sub request {
         return length $line;
     });
 
-    if (defined $arg) {
-        if ('' eq ref $arg) {
-            # will die() later
-            open my ($fh), q(+>:raw), $arg; ## no critic
-            $fh->autoflush(1);
-            $writedata = $fh;
-        } elsif (q(CODE) eq ref $arg) {
-            $easy->setopt(CURLOPT_WRITEFUNCTION ,=> sub {
-                my (undef, $chunk) = @_;
-                $arg->($chunk, $response, $self);
-                return length $chunk;
-            });
-            $writedata = undef;
-        }
+    if (q(CODE) eq ref $arg) {
+        $easy->setopt(CURLOPT_WRITEFUNCTION ,=> sub {
+            my (undef, $chunk) = @_;
+            $arg->($chunk, $response, $self);
+            return length $chunk;
+        });
+        $writedata = undef;
+    } elsif (defined $arg) {
+        # will die() later
+        open my $fh, q(+>:raw), $arg; ## no critic
+        $fh->autoflush(1);
+        $writedata = $fh;
+    } else {
+        $writedata = \$data;
     }
 
     my $encoding = 0;
@@ -158,18 +162,33 @@ sub request {
     $easy->setopt_ifdef(CURLOPT_WRITEDATA   ,=> $writedata);
 
     my $method = uc $request->method;
-    if ($method eq q(GET)) {
-        $easy->setopt(CURLOPT_HTTPGET       ,=> 1);
-    } elsif ($method eq q(POST)) {
-        $easy->setopt(CURLOPT_POSTFIELDS    ,=> $request->content);
-    } elsif ($method eq q(HEAD)) {
-        $easy->setopt(CURLOPT_NOBODY        ,=> 1);
-    } elsif ($method eq q(DELETE)) {
-        $easy->setopt(CURLOPT_CUSTOMREQUEST ,=> $method);
-    } elsif ($method eq q(PUT)) {
-        $easy->setopt(CURLOPT_UPLOAD        ,=> 1);
-        $easy->setopt(CURLOPT_READDATA      ,=> $request->content);
-        $easy->setopt(CURLOPT_INFILESIZE    ,=> length $request->content);
+    my %dispatch = (
+        GET => sub {
+            $easy->setopt(CURLOPT_HTTPGET   ,=> 1);
+        }, POST => sub {
+            $easy->setopt(CURLOPT_POST      ,=> 1);
+            $easy->setopt(CURLOPT_POSTFIELDS,=> $request->content);
+        }, HEAD => sub {
+            $easy->setopt(CURLOPT_NOBODY    ,=> 1);
+        }, DELETE => sub {
+            $easy->setopt(CURLOPT_CUSTOMREQUEST ,=> $method);
+        }, PUT => sub {
+            $easy->setopt(CURLOPT_UPLOAD    ,=> 1);
+            my $buf = $request->content;
+            my $off = 0;
+            $easy->setopt(CURLOPT_INFILESIZE,=> length $buf);
+            $easy->setopt(CURLOPT_READFUNCTION ,=> sub {
+                my (undef, $maxlen) = @_;
+                my $chunk = substr $buf, $off, $maxlen;
+                $off += length $chunk;
+                return \$chunk;
+            });
+        },
+    );
+
+    my $method_ref = $dispatch{$method};
+    if (defined $method_ref) {
+        $method_ref->();
     } else {
         return HTTP::Response->new(
             &HTTP::Status::RC_BAD_REQUEST,
@@ -204,26 +223,37 @@ sub request {
                 ++$encoding;
                 $easy->setopt(CURLOPT_ENCODING  ,=> join(q(,) => @encoding));
             }
-        } elsif ($key =~ /^user-agent$/ix and $value eq $ua->_agent) {
-            $easy->setopt(CURLOPT_USERAGENT     ,=> $ua->_agent . ' ' . Net::Curl::version);
+        } elsif ($key =~ /^user-agent$/ix) {
+            # While we try our best to look like LWP on the client-side,
+            # it's *definitely* different on the server-site!
+            # I guess it would be nice to introduce ourselves in a polite way.
+            $value =~ s/\b(\Q@{[ $ua->_agent ]}\E)\b/qq($1 ) . Net::Curl::version()/egx;
+            $easy->setopt(CURLOPT_USERAGENT     ,=> $value);
         } else {
             $easy->pushopt(CURLOPT_HTTPHEADER   ,=> [qq[$key: $value]]);
         }
     });
 
-    eval { $easy->perform };
-    my $error = looks_like_number($@) ? 0 + $@ : 0;
-    $ua->{curl_multi}->remove_handle($easy);
-    if ($error == CURLE_TOO_MANY_REDIRECTS) {
-        # will return the last request
-    } elsif ($error) {
-        return HTTP::Response->new(
-            &HTTP::Status::RC_BAD_REQUEST,
-            Net::Curl::Easy::strerror($error)
-        );
-    }
+    my $running = 0;
+    do {
+        my ($r, $w, $e) = $ua->{curl_multi}->fdset;
+        my $_timeout = $ua->{curl_multi}->timeout;
+        select($r, $w, $e, $_timeout / 1000)
+            if $_timeout > 9;
 
-    $response->request($request);
+        $running = $ua->{curl_multi}->perform;
+        while (my (undef, $_easy, $result) = $ua->{curl_multi}->info_read) {
+            $ua->{curl_multi}->remove_handle($_easy);
+            if ($result == CURLE_TOO_MANY_REDIRECTS) {
+                # will return the last request
+            } elsif ($result) {
+                return HTTP::Response->new(
+                    &HTTP::Status::RC_BAD_REQUEST,
+                    qq($result),
+                );
+            }
+        }
+    } while ($running);
 
     my $time = $easy->getinfo(CURLINFO_FILETIME);
     $response->headers->header(last_modified => time2str($time))
@@ -236,7 +266,6 @@ sub request {
         $writedata->sync;
     } elsif ($encoding) {
         $response->headers->header(content_encoding => q(identity));
-        $response->headers->header(content_length   => length $data);
     }
 
     return $self->collect_once($arg, $response, $data);
@@ -257,7 +286,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -296,6 +325,10 @@ lightning-fast L<HTTP compression|https://en.wikipedia.org/wiki/Http_compression
 =item *
 
 lower CPU usage: this matters if you C<fork()> multiple downloader instances
+
+=item *
+
+asynchronous threading via L<Coro::Select> (see F<eg/async.pl>)
 
 =item *
 
@@ -342,7 +375,11 @@ more tests
 
 =item *
 
-non-blocking version
+expose the inner guts of libcurl while handling encoding/redirects internally
+
+=item *
+
+revise L<Net::Curl::Multi> "event loop" code
 
 =back
 
@@ -352,7 +389,7 @@ non-blocking version
 
 =item *
 
-Complain about I<Attempt to free unreferenced scalar: SV 0xdeadbeef during global destruction.> if C<fork()> was used somewhere.
+complains about I<Attempt to free unreferenced scalar: SV 0xdeadbeef during global destruction.>
 
 =back
 
