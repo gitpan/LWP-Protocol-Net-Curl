@@ -1,6 +1,18 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.004 2012-10-31T13:00:27
+0.005 2012-11-01T15:16:06
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - singletonized Net::Curl::Share; bound private vars to Net::Curl::*
+   objects
+
+ - Merge branch 'master' of github.com:creaktive/LWP-Protocol-Net-Curl
+
+ - documented "async mode" blocking "feature"
+
+ - minor code/documentation cleanup
+
+
+v0.004 2012-10-31T12:59:03
  [Stanislaw Pusep <creaktive@gmail.com>]
  - minor code/documentation cleanup
 

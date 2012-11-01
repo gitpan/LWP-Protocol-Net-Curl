@@ -17,7 +17,12 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
+
+our %curlopt;
+our $share = Net::Curl::Share->new({ started => time });
+$share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
+eval { $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
 
 our @implements =
     sort grep { defined }
@@ -26,8 +31,6 @@ our @implements =
 
 LWP::Protocol::implementor($_ => __PACKAGE__)
     for @implements;
-
-our %curlopt;
 
 {
     no strict qw(refs);         ## no critic
@@ -81,18 +84,14 @@ sub request {
     my ($self, $request, $proxy, $arg, $size, $timeout) = @_;
 
     my $ua = $self->{ua};
-    if (q(Net::Curl::Multi) ne ref $ua->{curl_multi}) {
-        $ua->{curl_multi} = Net::Curl::Multi->new;
-        $ua->{curl_share} = Net::Curl::Share->new;
-        $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
-        eval { $ua->{curl_share}->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
-    }
+    $ua->{curl_multi} = Net::Curl::Multi->new({ def_headers => $ua->{def_headers} })
+        unless q(Net::Curl::Multi) eq ref $ua->{curl_multi};
 
     my $data = '';
     my $header = '';
     my $writedata;
 
-    my $easy = Net::Curl::Easy->new;
+    my $easy = Net::Curl::Easy->new({ request => $request });
     $ua->{curl_multi}->add_handle($easy);
 
     my $previous = undef;
@@ -152,7 +151,7 @@ sub request {
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
     $easy->setopt(CURLOPT_NOPROGRESS        ,=> not $ua->show_progress);
     $easy->setopt(CURLOPT_NOPROXY           ,=> join(q(,) => @{$ua->{no_proxy}}));
-    $easy->setopt(CURLOPT_SHARE             ,=> $ua->{curl_share});
+    $easy->setopt(CURLOPT_SHARE             ,=> $share);
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
     $easy->setopt_ifdef(CURLOPT_BUFFERSIZE  ,=> $size);
     $easy->setopt_ifdef(CURLOPT_INTERFACE   ,=> $ua->local_address);
@@ -259,8 +258,6 @@ sub request {
     $response->headers->header(last_modified => time2str($time))
         if $time > 0;
 
-    undef $easy;
-
     # handle decoded_content() & direct file write
     if (q(GLOB) eq ref $writedata) {
         $writedata->sync;
@@ -286,7 +283,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -390,6 +387,10 @@ revise L<Net::Curl::Multi> "event loop" code
 =item *
 
 complains about I<Attempt to free unreferenced scalar: SV 0xdeadbeef during global destruction.>
+
+=item *
+
+in "async mode", each L<LWP::UserAgent> instance "blocks" until all requests finish
 
 =back
 

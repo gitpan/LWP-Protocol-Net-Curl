@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -79,6 +79,9 @@ TODO
 BUGS
     *   complains about *Attempt to free unreferenced scalar: SV 0xdeadbeef
         during global destruction.*
+
+    *   in "async mode", each LWP::UserAgent instance "blocks" until all
+        requests finish
 
 SEE ALSO
     *   LWP::Protocol::GHTTP - used as a reference
