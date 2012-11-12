@@ -1,6 +1,13 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.005 2012-11-01T15:16:06
+0.006 2012-11-12T12:21:47
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - force binmode on :content_file
+
+ - fixed :content_file handling
+
+
+v0.005 2012-11-01T15:15:50
  [Stanislaw Pusep <creaktive@gmail.com>]
  - singletonized Net::Curl::Share; bound private vars to Net::Curl::*
    objects
