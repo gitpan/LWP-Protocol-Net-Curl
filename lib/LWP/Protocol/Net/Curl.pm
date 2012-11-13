@@ -17,7 +17,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %curlopt;
 our $share = Net::Curl::Share->new({ started => time });
@@ -84,8 +84,14 @@ sub request {
     my ($self, $request, $proxy, $arg, $size, $timeout) = @_;
 
     my $ua = $self->{ua};
-    $ua->{curl_multi} = Net::Curl::Multi->new({ def_headers => $ua->{def_headers} })
-        unless q(Net::Curl::Multi) eq ref $ua->{curl_multi};
+    unless (q(Net::Curl::Multi) eq ref $ua->{curl_multi}) {
+        $ua->{curl_multi} = Net::Curl::Multi->new({ def_headers => $ua->{def_headers} });
+
+        # avoid "callback function is not set" warning
+        $ua->{curl_multi}->setopt(CURLMOPT_SOCKETFUNCTION ,=> sub {
+            return 0;
+        });
+    }
 
     my $data = '';
     my $header = '';
@@ -284,7 +290,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

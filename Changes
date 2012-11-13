@@ -1,6 +1,14 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.006 2012-11-12T12:21:47
+0.007 2012-11-13T14:32:32
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - more reliable live tests
+
+ - minor fix: "callback function is not set" warning when libcurl has the
+   AsynchDNS feature
+
+
+v0.006 2012-11-12T02:00:17
  [Stanislaw Pusep <creaktive@gmail.com>]
  - force binmode on :content_file
 
