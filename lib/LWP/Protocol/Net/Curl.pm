@@ -17,7 +17,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %curlopt;
 our $share = Net::Curl::Share->new({ started => time });
@@ -27,22 +27,10 @@ eval { $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
 our @implements =
     sort grep { defined }
         @{ { map { ($_) x 2 } @{Net::Curl::version_info()->{protocols}} } }
-        {qw{ftp ftps http https sftp scp}};
+        {qw{ftp ftps gopher http https sftp scp}};
 
 LWP::Protocol::implementor($_ => __PACKAGE__)
     for @implements;
-
-{
-    no strict qw(refs);         ## no critic
-    no warnings qw(redefine);   ## no critic
-
-    *{'LWP::UserAgent::progress'} = sub {};
-    *{'Net::Curl::Easy::setopt_ifdef'} = sub {
-        my ($easy, $key, $value) = @_;
-        $easy->setopt(_curlopt($key) => $value)
-            if defined $value;
-    };
-}
 
 
 sub _curlopt {
@@ -63,6 +51,15 @@ sub _curlopt {
     carp qq(Invalid libcurl constant: $key) if $@;
 
     return $const;
+}
+
+sub _setopt_ifdef {
+    my ($easy, $key, $value) = @_;
+
+    $easy->setopt(_curlopt($key) => $value)
+        if defined $value;
+
+    return;
 }
 
 sub import {
@@ -112,11 +109,12 @@ sub request {
         if ($line =~ /^\s*$/sx) {
             $response = HTTP::Response->parse($header);
             my $msg = $response->message;
+            $msg = '' unless defined $msg;
             $msg =~ s/^\s+|\s+$//gsx;
             $response->message($msg);
 
             $response->request($request);
-            $response->previous($previous);
+            $response->previous($previous) if defined $previous;
             $previous = $response;
 
             $header = '';
@@ -148,22 +146,30 @@ sub request {
 
     # SSL stuff, may not be compiled
     if ($request->uri->scheme =~ /s$/ix) {
-        $easy->setopt_ifdef(CAINFO          => $ua->{ssl_opts}{SSL_ca_file});
-        $easy->setopt_ifdef(CAPATH          => $ua->{ssl_opts}{SSL_ca_path});
-        $easy->setopt_ifdef(SSL_VERIFYHOST  => $ua->{ssl_opts}{verify_hostname});
+        _setopt_ifdef($easy, CAINFO         => $ua->{ssl_opts}{SSL_ca_file});
+        _setopt_ifdef($easy, CAPATH         => $ua->{ssl_opts}{SSL_ca_path});
+        _setopt_ifdef($easy, SSL_VERIFYHOST => $ua->{ssl_opts}{verify_hostname});
     }
 
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
-    $easy->setopt(CURLOPT_NOPROGRESS        ,=> not $ua->show_progress);
     $easy->setopt(CURLOPT_NOPROXY           ,=> join(q(,) => @{$ua->{no_proxy}}));
     $easy->setopt(CURLOPT_SHARE             ,=> $share);
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
-    $easy->setopt_ifdef(CURLOPT_BUFFERSIZE  ,=> $size);
-    $easy->setopt_ifdef(CURLOPT_INTERFACE   ,=> $ua->local_address);
-    $easy->setopt_ifdef(CURLOPT_MAXFILESIZE ,=> $ua->max_size);
-    $easy->setopt_ifdef(CURLOPT_PROXY       ,=> $proxy);
-    $easy->setopt_ifdef(CURLOPT_TIMEOUT     ,=> $timeout);
-    $easy->setopt_ifdef(CURLOPT_WRITEDATA   ,=> $writedata);
+    _setopt_ifdef($easy, CURLOPT_BUFFERSIZE ,=> $size);
+    _setopt_ifdef($easy, CURLOPT_INTERFACE  ,=> $ua->local_address);
+    _setopt_ifdef($easy, CURLOPT_MAXFILESIZE,=> $ua->max_size);
+    _setopt_ifdef($easy, CURLOPT_PROXY      ,=> $proxy);
+    _setopt_ifdef($easy, CURLOPT_TIMEOUT    ,=> $timeout);
+    _setopt_ifdef($easy, CURLOPT_WRITEDATA  ,=> $writedata);
+
+    if ($ua->show_progress) {
+        $easy->setopt(CURLOPT_NOPROGRESS        ,=> 0);
+        $easy->setopt(CURLOPT_PROGRESSFUNCTION  ,=> sub {
+            my (undef, $dltotal, $dlnow) = @_;
+            $ua->progress($dltotal ? $dlnow / $dltotal : q(tick));
+            return 0;
+        });
+    }
 
     my $method = uc $request->method;
     my %dispatch = (
@@ -259,6 +265,8 @@ sub request {
         }
     } while ($running);
 
+    $response->code($easy->getinfo(CURLINFO_RESPONSE_CODE) || 200);
+
     my $time = $easy->getinfo(CURLINFO_FILETIME);
     $response->headers->header(last_modified => time2str($time))
         if $time > 0;
@@ -290,7 +298,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

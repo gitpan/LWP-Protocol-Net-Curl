@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
         #!/usr/bin/env perl;

@@ -1,6 +1,20 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.007 2012-11-13T14:32:32
+0.008 2012-11-25T22:37:01
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - use LWP builtin progress() function
+
+ - there's no need to declare setopt_ifdef() in Net::Curl::Easy namespace
+
+ - added gopher support via libcurl
+
+ - t/05-live.t: safer checks for weird protocols
+
+ - check if there is no collision to store Net::Curl::Multi inside
+   LWP::UserAgent
+
+
+v0.007 2012-11-13T14:32:04
  [Stanislaw Pusep <creaktive@gmail.com>]
  - more reliable live tests
 
