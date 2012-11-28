@@ -6,7 +6,6 @@ build_requires:
   File::Find: 0
   File::Temp: 0
   FindBin: 0
-  IO::Socket::INET: 0
   LWP::Simple: 0
   Test::HTTP::Server: 0
   Test::More: 0
@@ -38,4 +37,4 @@ resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: 0.008
+version: 0.009

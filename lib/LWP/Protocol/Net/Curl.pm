@@ -17,7 +17,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our %curlopt;
 our $share = Net::Curl::Share->new({ started => time });
@@ -148,7 +148,9 @@ sub request {
     if ($request->uri->scheme =~ /s$/ix) {
         _setopt_ifdef($easy, CAINFO         => $ua->{ssl_opts}{SSL_ca_file});
         _setopt_ifdef($easy, CAPATH         => $ua->{ssl_opts}{SSL_ca_path});
-        _setopt_ifdef($easy, SSL_VERIFYHOST => $ua->{ssl_opts}{verify_hostname});
+
+        # fixes a security flaw denied by libcurl v7.28.1
+        _setopt_ifdef($easy, SSL_VERIFYHOST => (!!$ua->{ssl_opts}{verify_hostname}) << 1);
     }
 
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
@@ -298,7 +300,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

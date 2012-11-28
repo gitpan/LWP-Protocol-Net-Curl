@@ -1,6 +1,11 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.008 2012-11-25T22:37:01
+0.009 2012-11-28T19:01:35
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - fixed a security flaw which prevented HTTPS working with libcurl v7.28.1
+
+
+v0.008 2012-11-25T22:13:59
  [Stanislaw Pusep <creaktive@gmail.com>]
  - use LWP builtin progress() function
 
