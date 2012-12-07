@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "LWP::Protocol::Net::Curl",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Config" => 0,
     "Fcntl" => 0,
     "HTTP::Date" => 0,
     "LWP::Protocol" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

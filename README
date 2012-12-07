@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.009
+    version 0.010
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -85,6 +85,8 @@ BUGS
 
     *   parallel requests via Coro::Select are very inefficient; consider
         using YADA if you're into event-driven parallel user agents
+
+    *   Net::Curl::Share support is disabled on threaded Perl builds
 
 SEE ALSO
     *   LWP::Protocol::GHTTP - used as a reference for LWP::Protocol

@@ -9,6 +9,7 @@ use warnings qw(all);
 use base qw(LWP::Protocol);
 
 use Carp qw(carp);
+use Config;
 use Fcntl;
 use HTTP::Date;
 use LWP::UserAgent;
@@ -17,12 +18,15 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %curlopt;
-our $share = Net::Curl::Share->new({ started => time });
-$share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
-eval { $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
+our $share;
+unless (defined $Config{usethreads}) {
+    $share = Net::Curl::Share->new({ started => time });
+    $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
+    eval { $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
+}
 
 our @implements =
     sort grep { defined }
@@ -155,12 +159,12 @@ sub request {
 
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
     $easy->setopt(CURLOPT_NOPROXY           ,=> join(q(,) => @{$ua->{no_proxy}}));
-    $easy->setopt(CURLOPT_SHARE             ,=> $share);
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
     _setopt_ifdef($easy, CURLOPT_BUFFERSIZE ,=> $size);
     _setopt_ifdef($easy, CURLOPT_INTERFACE  ,=> $ua->local_address);
     _setopt_ifdef($easy, CURLOPT_MAXFILESIZE,=> $ua->max_size);
     _setopt_ifdef($easy, CURLOPT_PROXY      ,=> $proxy);
+    _setopt_ifdef($easy, CURLOPT_SHARE      ,=> $share);
     _setopt_ifdef($easy, CURLOPT_TIMEOUT    ,=> $timeout);
     _setopt_ifdef($easy, CURLOPT_WRITEDATA  ,=> $writedata);
 
@@ -300,7 +304,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -412,6 +416,10 @@ in "async mode", each L<LWP::UserAgent> instance "blocks" until all requests fin
 =item *
 
 parallel requests via L<Coro::Select> are B<very inefficient>; consider using L<YADA> if you're into event-driven parallel user agents
+
+=item *
+
+L<Net::Curl::Share> support is disabled on threaded Perl builds
 
 =back
 
