@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -43,6 +43,20 @@ DESCRIPTION
 LIBCURL INTERFACE
     You may query which LWP protocols are implemented through Net::Curl by
     accessing @LWP::Protocol::Net::Curl::implements.
+
+    By default, every protocol listed in that array will be implemented via
+    LWP::Protocol::Net::Curl. It is possible to import only specific
+    protocols:
+
+        use LWP::Protocol::Net::Curl takeover => 0;
+        LWP::Protocol::implementor(https => 'LWP::Protocol::Net::Curl');
+
+    The default value of "takeover" option is *true*, resulting in exactly
+    the same behavior:
+
+        use LWP::Protocol::Net::Curl takeover => 0;
+        LWP::Protocol::implementor($_ => 'LWP::Protocol::Net::Curl')
+            for @LWP::Protocol::Net::Curl::implements;
 
     Default curl_easy_setopt() options
     <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html> can be set during
