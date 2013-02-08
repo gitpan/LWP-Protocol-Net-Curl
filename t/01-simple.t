@@ -15,9 +15,15 @@ use LWP::Simple;
 use Test::HTTP::Server;
 use Test::More;
 
+## no critic (ProhibitPackageVars)
 ok(
-    grep(/^https?$/, @LWP::Protocol::Net::Curl::implements),
+    grep { /^https?$/x } @LWP::Protocol::Net::Curl::implements,
     q(implements: ) . join(q(/), @LWP::Protocol::Net::Curl::implements)
+);
+
+ok(
+    $LWP::Protocol::Net::Curl::implements{http},
+    q(implements HTTP)
 );
 
 my $server = Test::HTTP::Server->new;
@@ -42,4 +48,4 @@ like(
     q(HEAD)
 );
 
-done_testing(4);
+done_testing(5);

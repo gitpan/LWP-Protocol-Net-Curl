@@ -3,39 +3,25 @@ abstract: 'the power of libcurl in the palm of your hands!'
 author:
   - 'Stanislaw Pusep <stas@sysd.org>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
-  FindBin: 0
   LWP::Simple: 0
   Test::HTTP::Server: 0
-  Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: LWP-Protocol-Net-Curl
 requires:
-  Carp: 0
-  Config: 0
-  Fcntl: 0
   HTTP::Date: 0
   LWP::Protocol: 0
   LWP::UserAgent: 0
-  Net::Curl::Easy: 0
-  Net::Curl::Multi: 0
-  Net::Curl::Share: 0
-  Scalar::Util: 0
-  base: 0
+  Net::Curl: 0.25
   perl: 5.008
-  strict: 0
-  utf8: 0
-  warnings: 0
 resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: 0.011
+version: 0.012

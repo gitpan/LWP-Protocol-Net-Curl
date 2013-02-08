@@ -3,7 +3,7 @@ NAME
     hands!
 
 VERSION
-    version 0.011
+    version 0.012
 
 SYNOPSIS
         #!/usr/bin/env perl;
@@ -42,7 +42,8 @@ DESCRIPTION
 
 LIBCURL INTERFACE
     You may query which LWP protocols are implemented through Net::Curl by
-    accessing @LWP::Protocol::Net::Curl::implements.
+    accessing @LWP::Protocol::Net::Curl::implements or
+    %LWP::Protocol::Net::Curl::implements.
 
     By default, every protocol listed in that array will be implemented via
     LWP::Protocol::Net::Curl. It is possible to import only specific
@@ -52,7 +53,7 @@ LIBCURL INTERFACE
         LWP::Protocol::implementor(https => 'LWP::Protocol::Net::Curl');
 
     The default value of "takeover" option is *true*, resulting in exactly
-    the same behavior:
+    the same behavior as in:
 
         use LWP::Protocol::Net::Curl takeover => 0;
         LWP::Protocol::implementor($_ => 'LWP::Protocol::Net::Curl')

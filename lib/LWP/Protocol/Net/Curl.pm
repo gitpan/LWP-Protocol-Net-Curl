@@ -18,7 +18,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my %curlopt;
 my $share;
@@ -30,16 +30,18 @@ unless (defined $Config{usethreads}) {
     eval { $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_SSL_SESSION) };
 }
 
-## no critic (ProhibitPackageVars,ProhibitVoidMap)
+## no critic (ProhibitPackageVars)
+my %protocols = map { ($_) x 2 } @{Net::Curl::version_info()->{protocols}};
 our @implements =
     sort grep { defined }
-        @{ { map { ($_) x 2 } @{Net::Curl::version_info()->{protocols}} } }
+        @protocols
         {qw{ftp ftps gopher http https sftp scp}};
+our %implements = map { $_ => 1 } @implements;
 
 
 # Resolve libcurl constants by string
 sub _curlopt {
-    my ($key) = @_;
+    my ($key, $no_carp) = @_;
     return 0 + $key if looks_like_number($key);
 
     $key =~ s/^Net::Curl::Easy:://ix;
@@ -54,24 +56,28 @@ sub _curlopt {
         no warnings qw(once);
         return *$key->();
     };
-    carp qq(Invalid libcurl constant: $key) if $@;
+    carp qq(Invalid libcurl constant: $key)
+        if $@
+        and not defined $no_carp;
 
     return $const;
 }
 
 # Sugar for a common setopt() pattern
 sub _setopt_ifdef {
-    my ($easy, $key, $value) = @_;
+    my ($curl, $key, $value, $no_carp) = @_;
 
-    $easy->setopt(_curlopt($key) => $value)
-        if defined $value;
+    my $curlopt_key = _curlopt($key, $no_carp);
+    $curl->setopt($curlopt_key => $value)
+        if defined $curlopt_key
+        and defined $value;
 
     return;
 }
 
 # Pre-configure the module
 sub import {
-    my (undef, @args) = @_;
+    my ($class, @args) = @_;
 
     my $takeover = 1;
     if (@args) {
@@ -88,7 +94,7 @@ sub import {
     }
 
     if ($takeover) {
-        LWP::Protocol::implementor($_ => __PACKAGE__)
+        LWP::Protocol::implementor($_ => $class)
             for @implements;
     }
 
@@ -218,9 +224,11 @@ sub request {
         $ua->{curl_multi} = Net::Curl::Multi->new({ def_headers => $ua->{def_headers} });
 
         # avoid "callback function is not set" warning
-        $ua->{curl_multi}->setopt(CURLMOPT_SOCKETFUNCTION ,=> sub {
-            return 0;
-        });
+        _setopt_ifdef(
+            $ua->{curl_multi},
+            q(CURLMOPT_SOCKETFUNCTION) => sub { return 0 },
+            1,
+        );
     }
 
     my $data = '';
@@ -287,11 +295,11 @@ sub request {
     }
 
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
-    $easy->setopt(CURLOPT_NOPROXY           ,=> join(q(,) => @{$ua->{no_proxy}}));
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
     _setopt_ifdef($easy, CURLOPT_BUFFERSIZE ,=> $size);
     _setopt_ifdef($easy, CURLOPT_INTERFACE  ,=> $ua->local_address);
     _setopt_ifdef($easy, CURLOPT_MAXFILESIZE,=> $ua->max_size);
+    _setopt_ifdef($easy, q(CURLOPT_NOPROXY)  => join(q(,) => @{$ua->{no_proxy}}), 1);
     _setopt_ifdef($easy, CURLOPT_PROXY      ,=> $proxy);
     _setopt_ifdef($easy, CURLOPT_SHARE      ,=> $share);
     _setopt_ifdef($easy, CURLOPT_TIMEOUT    ,=> $timeout);
@@ -345,7 +353,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -397,7 +405,7 @@ at last but not least: B<100% compatible> with both L<LWP> and L<WWW::Mechanize>
 
 =head1 LIBCURL INTERFACE
 
-You may query which L<LWP> protocols are implemented through L<Net::Curl> by accessing C<@LWP::Protocol::Net::Curl::implements>.
+You may query which L<LWP> protocols are implemented through L<Net::Curl> by accessing C<@LWP::Protocol::Net::Curl::implements> or C<%LWP::Protocol::Net::Curl::implements>.
 
 By default, B<every protocol> listed in that array will be implemented via L<LWP::Protocol::Net::Curl>.
 It is possible to import only specific protocols:
@@ -405,7 +413,7 @@ It is possible to import only specific protocols:
     use LWP::Protocol::Net::Curl takeover => 0;
     LWP::Protocol::implementor(https => 'LWP::Protocol::Net::Curl');
 
-The default value of C<takeover> option is I<true>, resulting in exactly the same behavior:
+The default value of C<takeover> option is I<true>, resulting in exactly the same behavior as in:
 
     use LWP::Protocol::Net::Curl takeover => 0;
     LWP::Protocol::implementor($_ => 'LWP::Protocol::Net::Curl')
