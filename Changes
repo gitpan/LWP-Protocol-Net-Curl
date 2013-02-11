@@ -1,6 +1,12 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.012 2013-02-08T10:58:57
+0.013 2013-02-11T01:55:19
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - fixed issue #2 reported by NotBugger (reusing _curlopt() for ::Easy &
+   ::Multi instances was broken)
+
+
+v0.012 2013-02-08T00:41:32
  [Stanislaw Pusep <creaktive@gmail.com>]
  - ++[PrereqsClean]
 

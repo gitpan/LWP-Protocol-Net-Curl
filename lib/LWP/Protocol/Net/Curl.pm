@@ -18,7 +18,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my %curlopt;
 my $share;
@@ -48,7 +48,7 @@ sub _curlopt {
     $key =~ y/-/_/;
     $key =~ s/\W//gx;
     $key = uc $key;
-    $key = qq(CURLOPT_${key}) if $key !~ /^CURLOPT_/x;
+    $key = qq(CURLOPT_${key}) if $key !~ /^CURL(?:M|SH)?OPT_/x;
 
     ## no critic (ProhibitNoStrict,ProhibitNoWarnings)
     my $const = eval {
@@ -353,7 +353,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

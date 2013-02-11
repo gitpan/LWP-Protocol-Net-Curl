@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Net::Curl" => "0.25"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
