@@ -1,6 +1,11 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.013 2013-02-11T01:55:19
+0.014 2013-02-16T12:49:38
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - safer PUT/DELETE method call
+
+
+v0.013 2013-02-11T01:54:33
  [Stanislaw Pusep <creaktive@gmail.com>]
  - fixed issue #2 reported by NotBugger (reusing _curlopt() for ::Easy &
    ::Multi instances was broken)

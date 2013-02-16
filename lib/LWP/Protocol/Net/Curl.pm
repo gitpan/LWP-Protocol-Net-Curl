@@ -18,7 +18,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my %curlopt;
 my $share;
@@ -353,7 +353,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
