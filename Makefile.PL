@@ -11,10 +11,7 @@ use ExtUtils::MakeMaker 6.30;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "the power of libcurl in the palm of your hands!",
   "AUTHOR" => "Stanislaw Pusep <stas\@sysd.org>",
-  "BUILD_REQUIRES" => {
-    "LWP::Simple" => 0,
-    "Test::HTTP::Server" => 0
-  },
+  "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
   },
@@ -28,12 +25,29 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Net::Curl" => "0.25"
   },
-  "VERSION" => "0.014",
+  "TEST_REQUIRES" => {
+    "LWP::Simple" => 0,
+    "Test::HTTP::Server" => 0
+  },
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
+  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
+  for my $mod ( keys %$tr ) {
+    if ( exists $br->{$mod} ) {
+      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
+    }
+    else {
+      $br->{$mod} = $tr->{$mod};
+    }
+  }
+}
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};

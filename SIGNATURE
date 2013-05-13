@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 22355361fdd36388cbcd9838b02860bb2503b4d9 Changes
+SHA1 904796347906950898dceeab09c0437aed1df0cb LICENSE
+SHA1 49123b38c464d1696a4dab8e15e780963b386fc2 MANIFEST
+SHA1 f6e7dad40a4e07ddb1192052c2961ee7e3b2fc7c MANIFEST.SKIP
+SHA1 9e3333d3bbc9873b096a18fec658b9ac8205d92d META.yml
+SHA1 3f2d929837748c65754974effaebc2fb7a13b760 Makefile.PL
+SHA1 e698de66dc0fbbe610978a61dd7431f317982109 README
+SHA1 daff6cb34c6edba34c38a81a8c2cc9d8e1886a74 dist.ini
+SHA1 4a4d4e8f524ae9098737c09bb5e0d992c2a752f7 eg/async.pl
+SHA1 d94d77316d4703bcf795a8cbc5d13c34ccfcd6a5 eg/benchmark.pl
+SHA1 81bdccd2c2224e1e8d4b9a131d92a61c85c23307 lib/LWP/Protocol/Net/Curl.pm
+SHA1 41b7251366b2eeb10817591a705c1b7150308404 perlcritic.rc
+SHA1 becd1816dfa1e94e6520f88b82b4b4e000c9518d t/00-compile.t
+SHA1 74f7836045d68e154227ae9b963621275ee31781 t/00-load.t
+SHA1 6d27dae65a115efce3c79ffcc413dda4f169b428 t/01-simple.t
+SHA1 c73e20b3cf35e763176004a2c25f3703a3fdb55a t/02-ua.t
+SHA1 c90777ae1a402db3188b70ca1fdfa8c39776c67a t/03-file.t
+SHA1 015cb7f2912ec33df634034d8e1327b7277ffef5 t/04-callback.t
+SHA1 e142f2c8005fcbb2743c4d89caccf6418b3c3a1e t/05-live.t
+SHA1 2feb0ead70faf31a6cbbd690341f5bfa3efad5f6 t/06-edge.t
+SHA1 e672301c6733f8d4f9fad333d3245a6c1930695a t/07-min-libcurl.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 6abeb9902080f3ec6e0ae873f408e8a880b9b36d t/author-test-eol.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
+SHA1 6ea81e3865946a14536f97ccc65fee4b218c8148 t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+SHA1 b3350d3d17bb2fa4e23075ec8d786505cc565539 t/release-test-version.t
+SHA1 d7221447937ab93002a123801def7be09748c106 t/release-unused-vars.t
+SHA1 88f6d0940c2346383aceba628560c4798e2e9908 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (Darwin)
+
+iQEcBAEBAgAGBQJRkV3tAAoJEDlxU7ZVUpmiWQEIAKa9riXwr/cYJ/rMyoT0vRuv
+ofGHIJm+TYUqP1bYBdOj2BgjanThLECW51j9S1TdVhaiLsYuDlB6ecGV05+zGqWv
+DAx1TGLYBq38NQpNuGeHHZf6o53mv3qFWHFeib2S+pKiyFSNrQozII7j9Dt7pcIG
+kYnv7wH50kQWEO0ekW85W0PPXslDkUygxrMuM8S75IsY0e91cCOoyA/tLAygnOhG
+QSYhH8nIEXIg7jBXDYsbjZh1BLrGd/Y/yW7N1NKg89MEA541WeCZfDw0A3wYbPsF
+lgCpAtLyDNGDvGB7DAbjAMbnVnd4M5gyUGMm3JLtdmEKfjSDbA68EEq6NPeat1c=
+=fGZT
+-----END PGP SIGNATURE-----

@@ -18,7 +18,7 @@ use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my %curlopt;
 my $share;
@@ -38,6 +38,8 @@ our @implements =
         {qw{ftp ftps gopher http https sftp scp}};
 our %implements = map { $_ => 1 } @implements;
 
+our $use_select = Net::Curl::Multi->can(q(wait)) ? 0 : 1;
+
 
 # Resolve libcurl constants by string
 sub _curlopt {
@@ -50,8 +52,8 @@ sub _curlopt {
     $key = uc $key;
     $key = qq(CURLOPT_${key}) if $key !~ /^CURL(?:M|SH)?OPT_/x;
 
-    ## no critic (ProhibitNoStrict,ProhibitNoWarnings)
     my $const = eval {
+        ## no critic (ProhibitNoStrict ProhibitNoWarnings)
         no strict qw(refs);
         no warnings qw(once);
         return *$key->();
@@ -186,16 +188,22 @@ sub _fix_headers {
     return $encoding;
 }
 
-# Wrap libcurl perform() in a non-blocking way
+# Wrap libcurl perform() in a (potentially) non-blocking way
 sub _perform_loop {
     my ($multi) = @_;
 
     my $running = 0;
     do {
-        my ($r, $w, $e) = $multi->fdset;
         my $timeout = $multi->timeout;
-        select($r, $w, $e, $timeout / 1000)
-            if $timeout > 9;
+
+        if ($running and $timeout > 9) {
+            if ($use_select) {
+                my ($r, $w, $e) = $multi->fdset;
+                select($r, $w, $e, $timeout / 1000);
+            } else {
+                $multi->wait($timeout);
+            }
+        }
 
         $running = $multi->perform;
         while (my (undef, $easy, $result) = $multi->info_read) {
@@ -255,6 +263,7 @@ sub request {
             $response->message($msg);
 
             $response->request($request);
+            $response->request->uri($easy->getinfo(CURLINFO_EFFECTIVE_URL));
             $response->previous($previous) if defined $previous;
             $previous = $response;
 
@@ -353,7 +362,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

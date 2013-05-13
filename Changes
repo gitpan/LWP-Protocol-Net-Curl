@@ -1,6 +1,23 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.014 2013-02-16T12:49:38
+0.015 2013-05-13T21:40:58
+ [Stanislaw Pusep <creaktive@gmail.com>]
+ - signing with Module::Signature
+
+ - test fixes
+
+ - deduplicating symbols before checking in t/07-min-libcurl.t
+
+ - use Net::Curl::Multi::wait() instead of select(), when available
+
+ - fixed issue #3 by updating request->uri() with CURLINFO_EFFECTIVE_URL
+
+ - proper automated testing warning
+
+ - cleanup
+
+
+v0.014 2013-02-11T21:05:25
  [Stanislaw Pusep <creaktive@gmail.com>]
  - safer PUT/DELETE method call
 

@@ -5,6 +5,7 @@ MANIFEST.SKIP
 META.yml
 Makefile.PL
 README
+SIGNATURE
 dist.ini
 eg/async.pl
 eg/benchmark.pl
