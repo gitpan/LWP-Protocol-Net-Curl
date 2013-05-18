@@ -17,8 +17,9 @@ use Net::Curl::Easy qw(:constants);
 use Net::Curl::Multi qw(:constants);
 use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
+use URI;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my %curlopt;
 my $share;
@@ -251,7 +252,7 @@ sub request {
     $response->request($request);
 
     $easy->setopt(CURLOPT_HEADERFUNCTION ,=> sub {
-        my (undef, $line) = @_;
+        my ($_easy, $line) = @_;
         $header .= $line;
 
         # I hope only HTTP sends "empty line" as delimiters
@@ -262,8 +263,9 @@ sub request {
             $msg =~ s/^\s+|\s+$//gsx;
             $response->message($msg);
 
-            $response->request($request);
-            $response->request->uri($easy->getinfo(CURLINFO_EFFECTIVE_URL));
+            $response->request($request->clone);
+            my $effective_url = URI->new('' . $_easy->getinfo(CURLINFO_EFFECTIVE_URL));
+            $response->request->uri($effective_url);
             $response->previous($previous) if defined $previous;
             $previous = $response;
 
@@ -362,7 +364,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

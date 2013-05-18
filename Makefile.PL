@@ -23,13 +23,14 @@ my %WriteMakefileArgs = (
     "HTTP::Date" => 0,
     "LWP::Protocol" => 0,
     "LWP::UserAgent" => 0,
-    "Net::Curl" => "0.25"
+    "Net::Curl" => "0.25",
+    "URI" => 0
   },
   "TEST_REQUIRES" => {
     "LWP::Simple" => 0,
     "Test::HTTP::Server" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
