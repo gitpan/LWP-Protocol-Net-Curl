@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my %curlopt;
 my $share;
@@ -115,6 +115,7 @@ sub _handle_method {
         }, POST => sub {
             $easy->setopt(CURLOPT_POST      ,=> 1);
             $easy->setopt(CURLOPT_POSTFIELDS,=> $request->content);
+            $easy->setopt(CURLOPT_POSTFIELDSIZE,=> length $request->content);
         }, HEAD => sub {
             $easy->setopt(CURLOPT_NOBODY    ,=> 1);
         }, DELETE => sub {
@@ -364,7 +365,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

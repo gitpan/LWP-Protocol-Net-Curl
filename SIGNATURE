@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,27 +14,27 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 0ccc2b69a85ba73e2f4ed20b8caad21b11eb47a5 Changes
+SHA1 1758f04d7778304af697d4d7850b2f57eed9473f Changes
 SHA1 904796347906950898dceeab09c0437aed1df0cb LICENSE
 SHA1 49123b38c464d1696a4dab8e15e780963b386fc2 MANIFEST
 SHA1 f6e7dad40a4e07ddb1192052c2961ee7e3b2fc7c MANIFEST.SKIP
-SHA1 7e773ed972046a93450939cda24e8989f4f98a09 META.yml
-SHA1 7d98e7fa4522e5e4d1ac230e19ef2dcaf1197fc5 Makefile.PL
-SHA1 aceeca315f888413bd956e44bdcb6fe68de7f36f README
+SHA1 b79dac20a8dab8d1b9e226032f67e40e9bfaff05 META.yml
+SHA1 b9cc12b5e2625cda79951b0cecc8fc8ca579845e Makefile.PL
+SHA1 62f553470a0e60a7f192c5d7768a0585806850e0 README
 SHA1 daff6cb34c6edba34c38a81a8c2cc9d8e1886a74 dist.ini
 SHA1 4a4d4e8f524ae9098737c09bb5e0d992c2a752f7 eg/async.pl
 SHA1 d94d77316d4703bcf795a8cbc5d13c34ccfcd6a5 eg/benchmark.pl
-SHA1 fda80701e899b114ae107717aab54a88907ef984 lib/LWP/Protocol/Net/Curl.pm
+SHA1 8913a340ae80878071588378396725a7b3ba229a lib/LWP/Protocol/Net/Curl.pm
 SHA1 41b7251366b2eeb10817591a705c1b7150308404 perlcritic.rc
 SHA1 becd1816dfa1e94e6520f88b82b4b4e000c9518d t/00-compile.t
 SHA1 74f7836045d68e154227ae9b963621275ee31781 t/00-load.t
 SHA1 6d27dae65a115efce3c79ffcc413dda4f169b428 t/01-simple.t
-SHA1 c73e20b3cf35e763176004a2c25f3703a3fdb55a t/02-ua.t
+SHA1 9a8f341419d0a6bc8efd668a90378d1c54ffcea9 t/02-ua.t
 SHA1 c90777ae1a402db3188b70ca1fdfa8c39776c67a t/03-file.t
 SHA1 015cb7f2912ec33df634034d8e1327b7277ffef5 t/04-callback.t
 SHA1 53308e0ec2f6f41595e2860331cbe89b62ac93be t/05-live.t
 SHA1 2feb0ead70faf31a6cbbd690341f5bfa3efad5f6 t/06-edge.t
-SHA1 e672301c6733f8d4f9fad333d3245a6c1930695a t/07-min-libcurl.t
+SHA1 e3f5e4e8eef384f73c6100207556ac49a6500c75 t/07-min-libcurl.t
 SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
 SHA1 6abeb9902080f3ec6e0ae873f408e8a880b9b36d t/author-test-eol.t
 SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
@@ -55,11 +55,11 @@ SHA1 88f6d0940c2346383aceba628560c4798e2e9908 weaver.ini
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.13 (Darwin)
 
-iQEcBAEBAgAGBQJRl/yBAAoJEDlxU7ZVUpmid9gH/0ckNIWC5CPyhGz7tcpjCFr3
-esMXsP0ctqsAdV0d47Ed1EEzBqNglT2wVKq+4EWrVjYTyKOxpGYu6xVCS+CIpqwu
-bGjVLSbGScbO0mhPFU8PcJrtCGNf6bLG/iVDQ4RphaB6tKL9OGOa3KXjGfiv6khr
-FDKrzweM3j71oT2ynT5Cbk/UGYUAPK0cmxl4lduA1Y6fZo4DjQ6hh24E5yFFQYfx
-T99LlCRL7FYvd+36FTbBrLIuBNHvzfx9tuy8THjyGQXX9MkK3nd84mP89Z9IEIZz
-N36y8L/0zJcf7/IWIsnQo75u2JO2Y9a4c9jWIpYcrpQWHR7mmHqxnPv01v3wdb8=
-=ImZU
+iQEcBAEBAgAGBQJR4UZUAAoJEDlxU7ZVUpmic38H/1J2bEJrBrLjnj91QScHsVZW
+cdiv4pctU1Ow6wm+iFPCQ4L2QaB4I3cDvcER5gElZM8OvwaRFOf1geTR7pHCBM+p
+yfyMAE9VUcLYdl5VhX1de2TkslRqUO7zLauF/oxdpmo80XC/mPfTy6AST0vzmjv5
+c6S12JVcmQXcPQVlTDxYzCOlAv32J7T4d7bInuTUUN3CzmjmMSzYscdmdPCEjrn6
+0b3k6cM7ciMD/KykHUYKbA4jCTVFXdajWg172V0QQ0JUpDDelP4OEswUoPyHOJdF
+fMQ9DH4j/ZIvUnJH0UDzSDGr3ZlZroWxU8qfQOwR6YqZC207LyaVzhawoz8+8oI=
+=Yi4I
 -----END PGP SIGNATURE-----

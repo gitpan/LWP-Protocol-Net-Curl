@@ -1,187 +1,120 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.016 2013-05-18T22:11:11
- [Stanislaw Pusep <creaktive@gmail.com>]
+v0.017 2013-07-13T12:21:38
+ - Tests updated [Stanislaw Pusep]
+ - setopt(CURLOPT_POSTFIELDSIZE, ...) patch by pavalh@gmail.com [Stanislaw
+   Pusep]
+
+v0.016 2013-05-18T13:43:22
  - using local copy of a handle inside of the CURLOPT_HEADERFUNCTION
-   callback
-
- - attepmt to fix #4 by properly assigning the redirection chain
-
- - s/AUTOMATED_TESTING/EXTENDED_TESTING/
-
+   callback [Stanislaw Pusep]
+ - attepmt to fix #4 by properly assigning the redirection chain [Stanislaw
+   Pusep]
+ - s/AUTOMATED_TESTING/EXTENDED_TESTING/ [Stanislaw Pusep]
 
 v0.015 2013-05-13T21:37:21
- [Stanislaw Pusep <creaktive@gmail.com>]
- - signing with Module::Signature
-
- - test fixes
-
- - deduplicating symbols before checking in t/07-min-libcurl.t
-
+ - signing with Module::Signature [Stanislaw Pusep]
+ - test fixes [Stanislaw Pusep]
+ - deduplicating symbols before checking in t/07-min-libcurl.t [Stanislaw
+   Pusep]
  - use Net::Curl::Multi::wait() instead of select(), when available
-
+   [Stanislaw Pusep]
  - fixed issue #3 by updating request->uri() with CURLINFO_EFFECTIVE_URL
-
- - proper automated testing warning
-
- - cleanup
-
+   [Stanislaw Pusep]
+ - proper automated testing warning [Stanislaw Pusep]
+ - cleanup [Stanislaw Pusep]
 
 v0.014 2013-02-11T21:05:25
- [Stanislaw Pusep <creaktive@gmail.com>]
- - safer PUT/DELETE method call
-
+ - safer PUT/DELETE method call [Stanislaw Pusep]
 
 v0.013 2013-02-11T01:54:33
- [Stanislaw Pusep <creaktive@gmail.com>]
  - fixed issue #2 reported by NotBugger (reusing _curlopt() for ::Easy &
-   ::Multi instances was broken)
-
+   ::Multi instances was broken) [Stanislaw Pusep]
 
 v0.012 2013-02-08T00:41:32
- [Stanislaw Pusep <creaktive@gmail.com>]
- - ++[PrereqsClean]
-
+ - ++[PrereqsClean] [Stanislaw Pusep]
  - test compatibility with libcurl >= 7.10.8 (released Nov 1 2003)
-
- - now compatible with libcurl >= 7.10.8
-
- - compatibility with libcurl < 7.19.4 (bug reported by wreis)
-
- - added %implements
-
+   [Stanislaw Pusep]
+ - now compatible with libcurl >= 7.10.8 [Stanislaw Pusep]
+ - compatibility with libcurl < 7.19.4 (bug reported by wreis) [Stanislaw
+   Pusep]
+ - added %implements [Stanislaw Pusep]
 
 v0.011 2012-12-17T15:24:42
- [Stanislaw Pusep <creaktive@gmail.com>]
- - major refactor
-
+ - major refactor [Stanislaw Pusep]
 
 v0.010 2012-12-07T00:10:01
- [Stanislaw Pusep <creaktive@gmail.com>]
- - workaround to support Perl compiled with threads
-
+ - workaround to support Perl compiled with threads [Stanislaw Pusep]
 
 v0.009 2012-11-28T19:01:12
- [Stanislaw Pusep <creaktive@gmail.com>]
  - fixed a security flaw which prevented HTTPS working with libcurl v7.28.1
-
+   [Stanislaw Pusep]
 
 v0.008 2012-11-25T22:13:59
- [Stanislaw Pusep <creaktive@gmail.com>]
- - use LWP builtin progress() function
-
+ - use LWP builtin progress() function [Stanislaw Pusep]
  - there's no need to declare setopt_ifdef() in Net::Curl::Easy namespace
-
- - added gopher support via libcurl
-
- - t/05-live.t: safer checks for weird protocols
-
+   [Stanislaw Pusep]
+ - added gopher support via libcurl [Stanislaw Pusep]
+ - t/05-live.t: safer checks for weird protocols [Stanislaw Pusep]
  - check if there is no collision to store Net::Curl::Multi inside
-   LWP::UserAgent
-
+   LWP::UserAgent [Stanislaw Pusep]
 
 v0.007 2012-11-13T14:32:04
- [Stanislaw Pusep <creaktive@gmail.com>]
- - more reliable live tests
-
+ - more reliable live tests [Stanislaw Pusep]
  - minor fix: "callback function is not set" warning when libcurl has the
-   AsynchDNS feature
-
+   AsynchDNS feature [Stanislaw Pusep]
 
 v0.006 2012-11-12T02:00:17
- [Stanislaw Pusep <creaktive@gmail.com>]
- - force binmode on :content_file
-
- - fixed :content_file handling
-
+ - force binmode on :content_file [Stanislaw Pusep]
+ - fixed :content_file handling [Stanislaw Pusep]
 
 v0.005 2012-11-01T15:15:50
- [Stanislaw Pusep <creaktive@gmail.com>]
  - singletonized Net::Curl::Share; bound private vars to Net::Curl::*
-   objects
-
+   objects [Stanislaw Pusep]
  - Merge branch 'master' of github.com:creaktive/LWP-Protocol-Net-Curl
-
- - documented "async mode" blocking "feature"
-
- - minor code/documentation cleanup
-
+   [Stanislaw Pusep]
+ - documented "async mode" blocking "feature" [Stanislaw Pusep]
+ - minor code/documentation cleanup [Stanislaw Pusep]
 
 v0.004 2012-10-31T12:59:03
- [Stanislaw Pusep <creaktive@gmail.com>]
- - minor code/documentation cleanup
-
- - select() seems unhappy with timeout of 1 microsecond
-
- - POD update
-
- - added eg/async.pl
-
- - use a dispatch table to setup methods
-
- - select() on Net::Curl::Multi fdset
-
- - fixed the PUT method
-
- - 100% coverage
-
- - file tests cleanup
-
- - more live tests
-
- - edge case tests (check exception throwing for now)
-
- - using CURL_LOCK_DATA_COOKIE was actually a *bad* idea
-
+ - minor code/documentation cleanup [Stanislaw Pusep]
+ - select() seems unhappy with timeout of 1 microsecond [Stanislaw Pusep]
+ - POD update [Stanislaw Pusep]
+ - added eg/async.pl [Stanislaw Pusep]
+ - use a dispatch table to setup methods [Stanislaw Pusep]
+ - select() on Net::Curl::Multi fdset [Stanislaw Pusep]
+ - fixed the PUT method [Stanislaw Pusep]
+ - 100% coverage [Stanislaw Pusep]
+ - file tests cleanup [Stanislaw Pusep]
+ - more live tests [Stanislaw Pusep]
+ - edge case tests (check exception throwing for now) [Stanislaw Pusep]
+ - using CURL_LOCK_DATA_COOKIE was actually a *bad* idea [Stanislaw Pusep]
 
 v0.003 2012-10-29T18:49:01
- [Stanislaw Pusep <creaktive@gmail.com>]
- - Net::Curl::Easy::setopt hack
-
- - header parser refactored
-
- - direct filehandle output condition refactor
-
+ - Net::Curl::Easy::setopt hack [Stanislaw Pusep]
+ - header parser refactored [Stanislaw Pusep]
+ - direct filehandle output condition refactor [Stanislaw Pusep]
  - fixed persistence/caching; however, "Attempt to free unreferenced
-   scalar: SV 0xdeadbeef" is back :(
-
- - each $ua instance hold own Net::Curl::Share
-
+   scalar: SV 0xdeadbeef" is back :( [Stanislaw Pusep]
+ - each $ua instance hold own Net::Curl::Share [Stanislaw Pusep]
  - always use persistent connections; never use libcurl to handle POST
-   redirections
-
- - share DNS/cookies/SSL
-
- - fixed the messy redirection chain
-
- - progressbar/noproxy support
-
- - slurp big files directly to disk
-
- - handle redirects via libcurl
-
- - crude persistent connections support
-
+   redirections [Stanislaw Pusep]
+ - share DNS/cookies/SSL [Stanislaw Pusep]
+ - fixed the messy redirection chain [Stanislaw Pusep]
+ - progressbar/noproxy support [Stanislaw Pusep]
+ - slurp big files directly to disk [Stanislaw Pusep]
+ - handle redirects via libcurl [Stanislaw Pusep]
+ - crude persistent connections support [Stanislaw Pusep]
 
 v0.002 2012-10-26T19:58:34
- [Stanislaw Pusep <creaktive@gmail.com>]
- - more glue between libcurl & LWP
-
- - support $ua->ssl_opts
-
- - handle DELETE, PUT and weird request headers
-
+ - more glue between libcurl & LWP [Stanislaw Pusep]
+ - support $ua->ssl_opts [Stanislaw Pusep]
+ - handle DELETE, PUT and weird request headers [Stanislaw Pusep]
 
 v0.001 2012-10-24T18:42:58
- [Stanislaw Pusep <creaktive@gmail.com>]
- - tests & example
-
- - some documentation
-
- - compatible with Perl v5.8
-
- - Dist::Zillified
-
- - INIT
-
+ - tests & example [Stanislaw Pusep]
+ - some documentation [Stanislaw Pusep]
+ - compatible with Perl v5.8 [Stanislaw Pusep]
+ - Dist::Zillified [Stanislaw Pusep]
+ - INIT [Stanislaw Pusep]
 
