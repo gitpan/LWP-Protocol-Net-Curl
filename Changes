@@ -1,6 +1,12 @@
 Changelog for LWP-Protocol-Net-Curl
 
-v0.017 2013-07-13T12:21:38
+v0.018 2013-08-17T11:33:41
+ - Preparing for CURLOPT_PROGRESSFUNCTION deprecation [Stanislaw Pusep]
+ - Using symbols-in-versions from libcurl/7.32.0 [Stanislaw Pusep]
+ - Live test now using ftp.cpan.org in a non-passive mode [Stanislaw Pusep]
+ - Attempt to fix tests failing behind a proxy [Stanislaw Pusep]
+
+v0.017 2013-07-13T12:21:16
  - Tests updated [Stanislaw Pusep]
  - setopt(CURLOPT_POSTFIELDSIZE, ...) patch by pavalh@gmail.com [Stanislaw
    Pusep]

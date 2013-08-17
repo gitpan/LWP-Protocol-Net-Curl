@@ -14,33 +14,33 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 1758f04d7778304af697d4d7850b2f57eed9473f Changes
+SHA1 1b792ce24b13da57a6bfee3a9a0cb4eaad7ba2fe Changes
 SHA1 904796347906950898dceeab09c0437aed1df0cb LICENSE
 SHA1 49123b38c464d1696a4dab8e15e780963b386fc2 MANIFEST
 SHA1 f6e7dad40a4e07ddb1192052c2961ee7e3b2fc7c MANIFEST.SKIP
-SHA1 b79dac20a8dab8d1b9e226032f67e40e9bfaff05 META.yml
-SHA1 b9cc12b5e2625cda79951b0cecc8fc8ca579845e Makefile.PL
-SHA1 62f553470a0e60a7f192c5d7768a0585806850e0 README
+SHA1 269fafec608704846910e154e54ab6022a5d3e75 META.yml
+SHA1 f9e823733ad903112c979a541fa94a8b30a500e2 Makefile.PL
+SHA1 d3bd6f6a10cbe654e283b758cf4c331cfea17a77 README
 SHA1 daff6cb34c6edba34c38a81a8c2cc9d8e1886a74 dist.ini
 SHA1 4a4d4e8f524ae9098737c09bb5e0d992c2a752f7 eg/async.pl
 SHA1 d94d77316d4703bcf795a8cbc5d13c34ccfcd6a5 eg/benchmark.pl
-SHA1 8913a340ae80878071588378396725a7b3ba229a lib/LWP/Protocol/Net/Curl.pm
+SHA1 70a52bfd60fb58a0b87fc4d10e5f70e39582c9c4 lib/LWP/Protocol/Net/Curl.pm
 SHA1 41b7251366b2eeb10817591a705c1b7150308404 perlcritic.rc
-SHA1 becd1816dfa1e94e6520f88b82b4b4e000c9518d t/00-compile.t
+SHA1 9eec0d8b78a69509d3187a4fc34fa9b8a33ffa99 t/00-compile.t
 SHA1 74f7836045d68e154227ae9b963621275ee31781 t/00-load.t
-SHA1 6d27dae65a115efce3c79ffcc413dda4f169b428 t/01-simple.t
-SHA1 9a8f341419d0a6bc8efd668a90378d1c54ffcea9 t/02-ua.t
-SHA1 c90777ae1a402db3188b70ca1fdfa8c39776c67a t/03-file.t
-SHA1 015cb7f2912ec33df634034d8e1327b7277ffef5 t/04-callback.t
-SHA1 53308e0ec2f6f41595e2860331cbe89b62ac93be t/05-live.t
-SHA1 2feb0ead70faf31a6cbbd690341f5bfa3efad5f6 t/06-edge.t
-SHA1 e3f5e4e8eef384f73c6100207556ac49a6500c75 t/07-min-libcurl.t
+SHA1 478bae64c20fa36a7e0e811c931906d74a1c2909 t/01-simple.t
+SHA1 3f105a012db3ac98eb2cbb1d8b7d6372e2c102e6 t/02-ua.t
+SHA1 05d375db0c65f0c02fd747f836965fe9a3ed1ce8 t/03-file.t
+SHA1 4202059c9d8ee5314fe1c2e1a45c08aa869a81ef t/04-callback.t
+SHA1 f11332bf56da9343015018ac618eea45a1c444f5 t/05-live.t
+SHA1 2012ef57442f369e45499f839b77cc918c60978c t/06-edge.t
+SHA1 3987e757c5d03d34aad2feeee5b7e5532de665ac t/07-min-libcurl.t
 SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
 SHA1 6abeb9902080f3ec6e0ae873f408e8a880b9b36d t/author-test-eol.t
 SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
 SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
 SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
-SHA1 6ea81e3865946a14536f97ccc65fee4b218c8148 t/release-kwalitee.t
+SHA1 be1ff04ade66c334e56a388626b85cd5d27ed9c9 t/release-kwalitee.t
 SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
 SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
 SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
@@ -48,18 +48,18 @@ SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
 SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
 SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
 SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
-SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+SHA1 e647f89568819f60f56e2c7202e10b21acb77652 t/release-synopsis.t
 SHA1 b3350d3d17bb2fa4e23075ec8d786505cc565539 t/release-test-version.t
 SHA1 d7221447937ab93002a123801def7be09748c106 t/release-unused-vars.t
 SHA1 88f6d0940c2346383aceba628560c4798e2e9908 weaver.ini
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (Darwin)
+Version: GnuPG v1.4.14 (Darwin)
 
-iQEcBAEBAgAGBQJR4UZUAAoJEDlxU7ZVUpmic38H/1J2bEJrBrLjnj91QScHsVZW
-cdiv4pctU1Ow6wm+iFPCQ4L2QaB4I3cDvcER5gElZM8OvwaRFOf1geTR7pHCBM+p
-yfyMAE9VUcLYdl5VhX1de2TkslRqUO7zLauF/oxdpmo80XC/mPfTy6AST0vzmjv5
-c6S12JVcmQXcPQVlTDxYzCOlAv32J7T4d7bInuTUUN3CzmjmMSzYscdmdPCEjrn6
-0b3k6cM7ciMD/KykHUYKbA4jCTVFXdajWg172V0QQ0JUpDDelP4OEswUoPyHOJdF
-fMQ9DH4j/ZIvUnJH0UDzSDGr3ZlZroWxU8qfQOwR6YqZC207LyaVzhawoz8+8oI=
-=Yi4I
+iQEcBAEBAgAGBQJSD1+XAAoJEDlxU7ZVUpmicb4H/R+VjyeQdLO4Lfi4PfMUhIYh
+DSQIIuESE4WAaewHsBcB6+yp0CTX1R/6tNvjdFwVktrkX6loTErRfOhfYJJ75Q1D
+5WWAgoBz8lmQ4d4bK+bOp1AjiDJWGGJ7YnBEHZQT6IcyMCaawbwmxsR9ftFV+4Os
+kqwtdY2xe06mTYaUmkUJteXb/E+VdDh2HetsJeLcIlENCCSoN/2jUO4S+azHkao2
+xNRXEcNp4tmdfF7A4lJyyYD1Dxmp6BygXoYptYLB9czNathiIxbizTeqa5Q+Kt/b
+CtScMWtyXviEvUNj5nrEnNQS73qJvODgGGQzlNVrxE/jmGpaKHkhYsvVkZ92wqg=
+=RcOi
 -----END PGP SIGNATURE-----

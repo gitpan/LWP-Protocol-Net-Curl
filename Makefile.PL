@@ -27,10 +27,12 @@ my %WriteMakefileArgs = (
     "URI" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "LWP::Simple" => 0,
-    "Test::HTTP::Server" => 0
+    "Test::HTTP::Server" => 0,
+    "Test::More" => "0.88"
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }

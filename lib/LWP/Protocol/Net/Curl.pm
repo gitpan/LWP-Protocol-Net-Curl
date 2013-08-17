@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my %curlopt;
 my $share;
@@ -318,12 +318,16 @@ sub request {
     _setopt_ifdef($easy, CURLOPT_WRITEDATA  ,=> $writedata);
 
     if ($ua->show_progress) {
-        $easy->setopt(CURLOPT_NOPROGRESS        ,=> 0);
-        $easy->setopt(CURLOPT_PROGRESSFUNCTION  ,=> sub {
-            my (undef, $dltotal, $dlnow) = @_;
-            $ua->progress($dltotal ? $dlnow / $dltotal : q(tick));
-            return 0;
-        });
+        $easy->setopt(CURLOPT_NOPROGRESS    ,=> 0);
+        _setopt_ifdef(
+            $easy,
+            q(CURLOPT_PROGRESSFUNCTION)     => sub {
+                my (undef, $dltotal, $dlnow) = @_;
+                $ua->progress($dltotal ? $dlnow / $dltotal : q(tick));
+                return 0;
+            },
+            1,
+        );
     }
 
     _handle_method($ua, $easy, $request);
@@ -365,7 +369,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
