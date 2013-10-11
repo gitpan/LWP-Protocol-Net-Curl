@@ -1,6 +1,25 @@
 Changelog for LWP-Protocol-Net-Curl
 
-v0.018 2013-08-17T11:33:41
+v0.019 2013-10-11T12:32:33
+ - Marked PUT test as TODO
+   
+   Could fail due to something very system-specific. Already happened
+   before:
+   
+   https://github.com/sparky/perl-Net-Curl/commit/6abd458c3539bb9fe0a01ce4d
+   555cef6472d1212 [Stanislaw Pusep]
+ - Quick hack to solve issue #6
+   
+   Set CURLOPT_SSL_VERIFYPEER to 0 on ssl_opts => {verify_hostname => 0}.
+   Ugly, but seems to be the most backward-compatible way since LWP does
+   not have separate settings for verifypeer and verifyhost. [Stanislaw
+   Pusep]
+ - Quick hack to solve issue #7
+   
+   $ua->local_address available since LWP 5.834
+   $ua->show_progress available since LWP 5.815 [Stanislaw Pusep]
+
+v0.018 2013-08-17T11:32:29
  - Preparing for CURLOPT_PROGRESSFUNCTION deprecation [Stanislaw Pusep]
  - Using symbols-in-versions from libcurl/7.32.0 [Stanislaw Pusep]
  - Live test now using ftp.cpan.org in a non-passive mode [Stanislaw Pusep]

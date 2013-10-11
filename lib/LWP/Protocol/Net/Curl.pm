@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my %curlopt;
 my $share;
@@ -304,12 +304,13 @@ sub request {
 
         # fixes a security flaw denied by libcurl v7.28.1
         _setopt_ifdef($easy, SSL_VERIFYHOST => (!!$ua->{ssl_opts}{verify_hostname}) << 1);
+        _setopt_ifdef($easy, SSL_VERIFYPEER => 0) unless $ua->{ssl_opts}{verify_hostname};
     }
 
     $easy->setopt(CURLOPT_FILETIME          ,=> 1);
     $easy->setopt(CURLOPT_URL               ,=> $request->uri);
     _setopt_ifdef($easy, CURLOPT_BUFFERSIZE ,=> $size);
-    _setopt_ifdef($easy, CURLOPT_INTERFACE  ,=> $ua->local_address);
+    _setopt_ifdef($easy, CURLOPT_INTERFACE  ,=> $ua->{local_address});
     _setopt_ifdef($easy, CURLOPT_MAXFILESIZE,=> $ua->max_size);
     _setopt_ifdef($easy, q(CURLOPT_NOPROXY)  => join(q(,) => @{$ua->{no_proxy}}), 1);
     _setopt_ifdef($easy, CURLOPT_PROXY      ,=> $proxy);
@@ -317,7 +318,7 @@ sub request {
     _setopt_ifdef($easy, CURLOPT_TIMEOUT    ,=> $timeout);
     _setopt_ifdef($easy, CURLOPT_WRITEDATA  ,=> $writedata);
 
-    if ($ua->show_progress) {
+    if ($ua->{show_progress}) {
         $easy->setopt(CURLOPT_NOPROGRESS    ,=> 0);
         _setopt_ifdef(
             $easy,
@@ -369,7 +370,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
