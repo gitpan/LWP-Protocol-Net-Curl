@@ -19,12 +19,13 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 my %curlopt;
 my $share;
 unless (defined $Config{usethreads}) {
     $share = Net::Curl::Share->new({ started => time });
+    $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_COOKIE);
     $share->setopt(CURLSHOPT_SHARE ,=> CURL_LOCK_DATA_DNS);
 
     ## no critic (RequireCheckingReturnValueOfEval)
@@ -370,7 +371,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

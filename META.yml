@@ -25,4 +25,4 @@ resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: 0.019
+version: 0.020

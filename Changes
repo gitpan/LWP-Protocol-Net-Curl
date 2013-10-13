@@ -1,6 +1,12 @@
 Changelog for LWP-Protocol-Net-Curl
 
-v0.019 2013-10-11T12:32:33
+v0.020 2013-10-13T08:55:29
+ - Partial fix for issue #5
+   
+   Still broken on Perl compiled with thread support because
+   Net::Curl::Share is disabled. [Stanislaw Pusep]
+
+v0.019 2013-10-11T12:30:17
  - Marked PUT test as TODO
    
    Could fail due to something very system-specific. Already happened
