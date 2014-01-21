@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 my %curlopt;
 my $share;
@@ -184,6 +184,8 @@ sub _fix_headers {
         # I guess it would be nice to introduce ourselves in a polite way.
         $value =~ s/\b(\Q@{[ $ua->_agent ]}\E)\b/qq($1 ) . Net::Curl::version()/egx;
         $easy->setopt(CURLOPT_USERAGENT     ,=> $value);
+    } elsif ($key =~ /^x[-_](curlopt[-\w]+)$/ix) {
+        _setopt_ifdef($easy, $1 => $value);
     } else {
         $easy->pushopt(CURLOPT_HTTPHEADER   ,=> [qq[$key: $value]]);
     }
@@ -363,7 +365,7 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -371,7 +373,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -443,6 +445,17 @@ Default L<curl_easy_setopt() options|http://curl.haxx.se/libcurl/c/curl_easy_set
         encoding    => '',  # use HTTP compression by default
         referer     => 'http://google.com/',
         verbose     => 1;   # make libcurl print lots of stuff to STDERR
+
+Or during runtime, using special HTTP headers (prefixed by C<X-CurlOpt->):
+
+    use LWP::Protocol::Net::Curl;
+    use LWP::UserAgent;
+
+    my $ua = LWP::UserAgent->new;
+    my $res = $ua->get(
+        'https://metacpan.org/',
+        X_CurlOpt_Verbose => 1,
+    );
 
 Options set this way have the lowest precedence.
 For instance, if L<WWW::Mechanize> sets the I<Referer:> by it's own, the value you defined above won't be used.
@@ -534,7 +547,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Stanislaw Pusep.
+This software is copyright (c) 2014 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
