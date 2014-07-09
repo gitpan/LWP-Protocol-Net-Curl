@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my %curlopt;
 my $share;
@@ -304,6 +304,8 @@ sub request {
     if ($request->uri->scheme =~ /s$/ix) {
         _setopt_ifdef($easy, CAINFO         => $ua->{ssl_opts}{SSL_ca_file});
         _setopt_ifdef($easy, CAPATH         => $ua->{ssl_opts}{SSL_ca_path});
+        _setopt_ifdef($easy, CURLOPT_SSLCERT=> $ua->{ssl_opts}{SSL_cert_file});
+        _setopt_ifdef($easy, CURLOPT_SSLKEY => $ua->{ssl_opts}{SSL_key_file});
 
         # fixes a security flaw denied by libcurl v7.28.1
         _setopt_ifdef($easy, SSL_VERIFYHOST => (!!$ua->{ssl_opts}{verify_hostname}) << 1);
@@ -373,7 +375,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
