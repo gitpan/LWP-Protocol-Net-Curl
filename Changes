@@ -1,6 +1,11 @@
 Changelog for LWP-Protocol-Net-Curl
 
-0.022 2014-07-09T14:59:49
+0.023 2014-12-23T17:02:32
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Cleanup (Stanislaw Pusep)
+ - Fixes duplicate content-length header in HTTP PUT (Peter Williams)
+
+0.022 2014-07-09T14:50:46
  - 2 new constants used (Stanislaw Pusep)
  - Support SSL_cert_file/SSL_key_file ssl_opts() (Stanislaw Pusep)
  - A plausible fix for issue #9 (Stanislaw Pusep)

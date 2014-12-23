@@ -1,15 +1,15 @@
 
 BEGIN {
-  unless ($ENV{RELEASE_TESTING}) {
+  unless ($ENV{AUTHOR_TESTING}) {
     require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    Test::More::plan(skip_all => 'these tests are for testing by the author');
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.08
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.09
 
 use Test::More 0.88;
 use Test::NoTabs;
@@ -27,14 +27,14 @@ my @files = (
     't/07-min-libcurl.t',
     't/08-curlopt-fwd.t',
     't/author-critic.t',
-    't/author-test-eol.t',
+    't/author-eol.t',
+    't/author-no-tabs.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
     't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-minimum-version.t',
     't/release-mojibake.t',
-    't/release-no-tabs.t',
     't/release-pod-coverage.t',
     't/release-pod-linkcheck.t',
     't/release-pod-syntax.t',

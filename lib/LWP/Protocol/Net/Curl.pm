@@ -19,7 +19,7 @@ use Net::Curl::Share qw(:constants);
 use Scalar::Util qw(looks_like_number);
 use URI;
 
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my %curlopt;
 my $share;
@@ -125,7 +125,14 @@ sub _handle_method {
             $easy->setopt(CURLOPT_UPLOAD    ,=> 1);
             my $buf = $request->content;
             my $off = 0;
-            $easy->setopt(CURLOPT_INFILESIZE,=> length $buf);
+            # Do not set CURLOPT_INFILESIZE if Content-Length header exists
+            # and libcurl version is earlier than 7.23.0 (note libcurl will
+            # send two Content-Length headers in versions earlier than 7.23.0
+            # when both the Content-Length header and CURLOPT_INFILESIZE
+            # option is set).
+            $easy->setopt(CURLOPT_INFILESIZE,=> length $buf)
+                if !defined $request->header('Content-Length')
+                    || Net::Curl::version_info()->{version_num} >= 0x72300;
             $easy->setopt(CURLOPT_READFUNCTION ,=> sub {
                 my (undef, $maxlen) = @_;
                 my $chunk = substr $buf, $off, $maxlen;
@@ -375,7 +382,7 @@ LWP::Protocol::Net::Curl - the power of libcurl in the palm of your hands!
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -553,5 +560,11 @@ This software is copyright (c) 2014 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Peter Williams
+
+Peter Williams <pjwilliams@gmail.com>
 
 =cut

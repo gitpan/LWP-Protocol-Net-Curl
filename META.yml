@@ -6,10 +6,8 @@ build_requires:
   LWP::Simple: '0'
   Test::HTTP::Server: '0'
   perl: '5.008'
-configure_requires:
-  ExtUtils::MakeMaker: '6.30'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,4 +24,6 @@ resources:
   bugtracker: https://github.com/creaktive/LWP-Protocol-Net-Curl/issues
   homepage: https://github.com/creaktive/LWP-Protocol-Net-Curl
   repository: git://github.com/creaktive/LWP-Protocol-Net-Curl.git
-version: '0.022'
+version: '0.023'
+x_contributors:
+  - 'Peter Williams <pjwilliams@gmail.com>'
